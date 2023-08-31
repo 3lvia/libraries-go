@@ -1,4 +1,4 @@
-module github.com/3lvia/elvid-go
+module github.com/3lvia/libraries-go/pkg/elvid
 
 go 1.20
 

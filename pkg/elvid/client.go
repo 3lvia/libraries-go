@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/3lvia/elvid-go/internal/tlsclient"
+	"github.com/3lvia/libraries-go/pkg/elvid/internal/tlsclient"
 	"github.com/MicahParks/keyfunc/v2"
 	"github.com/golang-jwt/jwt/v5"
 )

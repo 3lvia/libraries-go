@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/3lvia/elvid-go/internal/cert"
+	"github.com/3lvia/libraries-go/pkg/elvid/internal/cert"
 )
 
 // New creates a new instance of http.Client that is configured to use tls.VersionTLS12 as minimum

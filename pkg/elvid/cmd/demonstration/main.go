@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/3lvia/elvid-go/elvid"
+	"github.com/3lvia/libraries-go/pkg/elvid"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
