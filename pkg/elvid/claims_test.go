@@ -3,7 +3,7 @@ package elvid
 import (
 	"testing"
 
-	"github.com/3lvia/elvid-go/testing/assert"
+	"github.com/3lvia/libraries-go/pkg/elvid/testing/assert"
 	"github.com/golang-jwt/jwt/v5"
 )
 
