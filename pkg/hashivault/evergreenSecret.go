@@ -46,22 +46,25 @@ func (e *evergreenSecret) get() map[string]any {
 func (e *evergreenSecret) start(errChan chan<- error) {
 	for {
 		<-time.After(time.Duration(e.sec.LeaseDuration) * time.Second)
-		e.mux.Lock()
-
-		tracer := otel.GetTracerProvider().Tracer(tracerName)
-		ctx, span := tracer.Start(
-			context.Background(),
-			"hashivault.evergreenSecret.start",
-			trace.WithAttributes(attribute.String("path", e.path)))
-		defer span.End()
-
-		sec, err := get(ctx, e.path, e.vaultAddress, e.tokenGetter(), e.client, e.l)
-		if err != nil {
-			errChan <- err
-			e.mux.Unlock()
-			continue
-		}
-		e.sec = sec
-		e.mux.Unlock()
+		e.roundtrip(errChan)
 	}
+}
+
+func (e *evergreenSecret) roundtrip(errChan chan<- error) {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+
+	tracer := otel.GetTracerProvider().Tracer(tracerName)
+	ctx, span := tracer.Start(
+		context.Background(),
+		"hashivault.evergreenSecret.start",
+		trace.WithAttributes(attribute.String("path", e.path)))
+	defer span.End()
+
+	sec, err := get(ctx, e.path, e.vaultAddress, e.tokenGetter(), e.client, e.l)
+	if err != nil {
+		errChan <- err
+		return
+	}
+	e.sec = sec
 }

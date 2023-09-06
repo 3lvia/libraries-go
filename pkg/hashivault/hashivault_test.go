@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -16,6 +17,10 @@ import (
 
 func TestNew_static(t *testing.T) {
 	ctx := context.Background()
+
+	if err := os.Setenv("VAULT_ADDR", ""); err != nil {
+		t.Fatal(err)
+	}
 
 	var buf bytes.Buffer
 	l := log.New(&buf, "", log.LstdFlags)

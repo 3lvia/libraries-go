@@ -2,7 +2,7 @@
 Package hashivault provides a Vault client for the Hashicorp Vault secrets management solution.
 
 AUTHENTICATION
-Four modes of authentication against Vault are supported(here listed according to precedence):
+Four modes of authentication against Vault are supported (here listed according to precedence):
 1. Vault tokens (for people), usually in debugging situations where the other methods are not available
 2. Kubernetes authentication for pods
 3. Azure AD SSO authentication (OICD) for people
@@ -85,7 +85,7 @@ The following example shows how to use the SecretsManager:
 import (
 
 	"context"
-	"github.com/3lvia/hashivault-go/pkg/hashivault"
+	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/trace"
