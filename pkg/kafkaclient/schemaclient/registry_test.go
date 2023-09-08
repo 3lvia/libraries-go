@@ -1,4 +1,4 @@
-package kafkaclient
+package schemaclient
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestInit(t *testing.T) {
+func Test_newRegistry(t *testing.T) {
 	ctx := context.Background()
 
 	vaultAddr := "https://vault.dev-elvia.io"
@@ -31,7 +31,17 @@ func TestInit(t *testing.T) {
 		}
 	}(errChan)
 
-	if err := Init(ctx, "edna", "private.dp.edna.examples", WithSecretsManager(v)); err != nil {
+	r, err := New(ctx, "edna", WithSecretsManager(v))
+	if err != nil {
 		t.Fatal(err)
 	}
+
+	topic := "private.dp.edna.examples"
+
+	s, err := r.Get(topic)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_ = s
 }

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func New(ctx context.Context, system, topic string, opts ...Option) (SchemaRegistry, error) {
+func New(ctx context.Context, system string, opts ...Option) (SchemaRegistry, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
@@ -21,7 +21,7 @@ func New(ctx context.Context, system, topic string, opts ...Option) (SchemaRegis
 		c = &http.Client{}
 	}
 
-	r, err := newRegistry(ctx, system, topic, collector.secrets, c)
+	r, err := newRegistry(ctx, system, collector.secrets, c)
 	if err != nil {
 		return nil, err
 	}
