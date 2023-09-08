@@ -3,7 +3,7 @@ package kafkaclient
 import (
 	"context"
 	"errors"
-	"github.com/3lvia/libraries-go/pkg/kafkaclient/schemaclient"
+	"github.com/3lvia/libraries-go/pkg/mschema"
 	"net/http"
 )
 
@@ -22,12 +22,16 @@ func Start(ctx context.Context, system, topic string, opts ...Option) (<-chan *S
 		c = &http.Client{}
 	}
 
-	sClient, err := schemaclient.New(ctx, system, schemaclient.WithSecretsManager(collector.secrets), schemaclient.WithHTTPClient(c))
+	registryKey, registrySecret, registryURL, err := getSecrets(ctx, system, collector.secrets)
 	if err != nil {
 		return nil, err
 	}
 
-	schema, err := sClient.Get(topic)
+	if err := mschema.Init(mschema.WithClient(c), mschema.WithUser(registryKey, registrySecret), mschema.WithSchemaRegistryURL(registryURL)); err != nil {
+		return nil, err
+	}
+
+	schema, err := mschema.Get(topic)
 	if err != nil {
 		return nil, err
 	}
