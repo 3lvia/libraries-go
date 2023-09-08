@@ -5,31 +5,29 @@ import (
 	"sync"
 )
 
-var (
-	schemaRegistryURL string
-	user              string
-	password          string
-)
-
-var schemasByID = map[int]Descriptor{}
-var mux = &sync.Mutex{}
-
-var currentHTTPClient = &http.Client{}
-
-func Init(opts ...Option) error {
+func New(opts ...Option) (Registry, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
 	}
 
-	schemaRegistryURL = collector.schemaRegistryURL
-	user = collector.user
-	password = collector.password
+	schemaRegistryURL := collector.schemaRegistryURL
+	user := collector.user
+	password := collector.password
 
-	currentHTTPClient = collector.client
+	currentHTTPClient := collector.client
 	if currentHTTPClient == nil {
 		currentHTTPClient = &http.Client{}
 	}
 
-	return nil
+	r := &registry{
+		url:         schemaRegistryURL,
+		user:        user,
+		password:    password,
+		client:      currentHTTPClient,
+		descriptors: map[string]Descriptor{},
+		mux:         &sync.RWMutex{},
+	}
+
+	return r, nil
 }

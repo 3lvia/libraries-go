@@ -22,6 +22,11 @@ func TypeName(t Type) string {
 	}
 }
 
+type Registry interface {
+	GetByID(id int) (Descriptor, error)
+	GetBySubject(subject string) (Descriptor, error)
+}
+
 // Descriptor is a structure that describes a message schema.
 type Descriptor interface {
 	// Type returns the type of the schema.
