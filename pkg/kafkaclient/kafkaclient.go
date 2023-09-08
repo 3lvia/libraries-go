@@ -7,14 +7,14 @@ import (
 	"net/http"
 )
 
-func Init(ctx context.Context, system, topic string, opts ...Option) error {
+func Start(ctx context.Context, system, topic string, opts ...Option) (<-chan *StreamingMessage, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
 	}
 
 	if collector.secrets == nil {
-		return errors.New("no secrets manager provided")
+		return nil, errors.New("no secrets manager provided")
 	}
 
 	c := collector.client
@@ -22,11 +22,18 @@ func Init(ctx context.Context, system, topic string, opts ...Option) error {
 		c = &http.Client{}
 	}
 
-	sClient, err := schemaclient.New(ctx, system, topic, schemaclient.WithSecretsManager(collector.secrets), schemaclient.WithHTTPClient(c))
+	sClient, err := schemaclient.New(ctx, system, schemaclient.WithSecretsManager(collector.secrets), schemaclient.WithHTTPClient(c))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_ = sClient
 
-	return nil
+	schema, err := sClient.Get(topic)
+	if err != nil {
+		return nil, err
+	}
+	_ = schema
+
+	ch := make(chan *StreamingMessage)
+
+	return ch, nil
 }

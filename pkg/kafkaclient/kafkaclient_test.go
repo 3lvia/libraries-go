@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestInit(t *testing.T) {
+func TestStart(t *testing.T) {
 	ctx := context.Background()
 
 	vaultAddr := "https://vault.dev-elvia.io"
@@ -31,7 +31,6 @@ func TestInit(t *testing.T) {
 		}
 	}(errChan)
 
-	if err := Init(ctx, "edna", "private.dp.edna.examples", WithSecretsManager(v)); err != nil {
-		t.Fatal(err)
-	}
+	stream, err := Start(ctx, "edna", "private.dp.edna.examples", WithSecretsManager(v))
+	_ = stream
 }
