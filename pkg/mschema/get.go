@@ -25,6 +25,7 @@ func getById(ctx context.Context, id int, url, user, password string, client *ht
 
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
@@ -32,23 +33,37 @@ func getById(ctx context.Context, id int, url, user, password string, client *ht
 
 	resp, err := client.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	status := resp.StatusCode
+	span.SetAttributes(attribute.Int("status", status))
+
+	if status < 200 || status >= 300 {
+		err = fmt.Errorf("unexpected status code: %d", status)
+		span.RecordError(err)
+		return nil, err
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	var d descriptor
 	err = json.Unmarshal(body, &d)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	if d.ErrorCode != 0 {
-		return nil, errors.New(d.Message)
+		err = errors.New(d.Message)
+		span.RecordError(err)
+		return nil, err
 	}
 
 	return d, nil
@@ -67,6 +82,7 @@ func get(ctx context.Context, topic, url, user, password string, client *http.Cl
 
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
@@ -74,23 +90,37 @@ func get(ctx context.Context, topic, url, user, password string, client *http.Cl
 
 	resp, err := client.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	status := resp.StatusCode
+	span.SetAttributes(attribute.Int("status", status))
+
+	if status < 200 || status >= 300 {
+		err = fmt.Errorf("unexpected status code: %d", status)
+		span.RecordError(err)
+		return nil, err
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	var d descriptor
 	err = json.Unmarshal(body, &d)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	if d.ErrorCode != 0 {
-		return nil, errors.New(d.Message)
+		err = errors.New(d.Message)
+		span.RecordError(err)
+		return nil, err
 	}
 
 	return d, nil
