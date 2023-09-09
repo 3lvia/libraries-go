@@ -1,5 +1,7 @@
 package mschema
 
+import "context"
+
 // Type represents the type of a schema.
 type Type int
 
@@ -23,8 +25,8 @@ func TypeName(t Type) string {
 }
 
 type Registry interface {
-	GetByID(id int) (Descriptor, error)
-	GetBySubject(subject string) (Descriptor, error)
+	GetByID(ctx context.Context, id int) (Descriptor, error)
+	GetBySubject(ctx context.Context, subject string) (Descriptor, error)
 }
 
 // Descriptor is a structure that describes a message schema.

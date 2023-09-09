@@ -1,16 +1,28 @@
 package mschema
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"io"
 	"net/http"
 )
 
 // GetById returns the schema descriptor for the given schema ID.
-func getById(id int, url, user, password string, client *http.Client) (Descriptor, error) {
+func getById(ctx context.Context, id int, url, user, password string, client *http.Client, tracerName string) (Descriptor, error) {
 	fullURL := fmt.Sprintf("%s/schemas/ids/%d", url, id)
+
+	tracer := otel.GetTracerProvider().Tracer(tracerName)
+	_, span := tracer.Start(
+		ctx,
+		"mschema.getById",
+		trace.WithAttributes(attribute.Int("id", id), attribute.String("url", fullURL)))
+	defer span.End()
+
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err
@@ -43,8 +55,16 @@ func getById(id int, url, user, password string, client *http.Client) (Descripto
 }
 
 // Get returns the schema descriptor for the latest version of the given topic.
-func get(topic, url, user, password string, client *http.Client) (Descriptor, error) {
+func get(ctx context.Context, topic, url, user, password string, client *http.Client, tracerName string) (Descriptor, error) {
 	fullURL := fmt.Sprintf("%s/subjects/%s-value/versions/latest", url, topic)
+
+	tracer := otel.GetTracerProvider().Tracer(tracerName)
+	_, span := tracer.Start(
+		ctx,
+		"mschema.get",
+		trace.WithAttributes(attribute.String("topic", topic), attribute.String("url", fullURL)))
+	defer span.End()
+
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err

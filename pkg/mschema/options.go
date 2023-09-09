@@ -6,6 +6,7 @@ type optionsCollector struct {
 	schemaRegistryURL string
 	user              string
 	password          string
+	otelTracerName    string
 	client            *http.Client
 }
 
@@ -32,5 +33,13 @@ func WithUser(user, password string) Option {
 func WithClient(client *http.Client) Option {
 	return func(collector *optionsCollector) {
 		collector.client = client
+	}
+}
+
+// WithOtelTracerName sets the name of the OpenTelemetry tracer to use when creating spans. If no name is set the
+// tracer name "go.opentelemetry.io/otel" is used.
+func WithOtelTracerName(name string) Option {
+	return func(o *optionsCollector) {
+		o.otelTracerName = name
 	}
 }
