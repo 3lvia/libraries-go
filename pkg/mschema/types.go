@@ -2,7 +2,7 @@ package mschema
 
 import "context"
 
-// Type represents the type of a schema.
+// Type specifies how the schema is encoded.
 type Type int
 
 const (
@@ -11,6 +11,7 @@ const (
 	AVRO
 )
 
+// TypeName returns the name of the schema type.
 func TypeName(t Type) string {
 	switch t {
 	case JSON:
@@ -24,6 +25,7 @@ func TypeName(t Type) string {
 	}
 }
 
+// Registry is an interface that describes a schema registry. This is the main abstraction of this package.
 type Registry interface {
 	GetByID(ctx context.Context, id int) (Descriptor, error)
 	GetBySubject(ctx context.Context, subject string) (Descriptor, error)
@@ -78,6 +80,4 @@ func (d descriptor) Type() Type {
 	default:
 		return AVRO
 	}
-
-	return -1
 }

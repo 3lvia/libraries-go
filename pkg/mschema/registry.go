@@ -10,13 +10,16 @@ import (
 	"sync"
 )
 
-func newRegistry(collector *optionsCollector) Registry {
+func newRegistry(url string, collector *optionsCollector) (Registry, error) {
 	tracerName := collector.otelTracerName
 	if tracerName == "" {
 		tracerName = defaultTracerName
 	}
 
-	schemaRegistryURL := collector.schemaRegistryURL
+	if url == "" {
+		return nil, fmt.Errorf("schema registry URL is required")
+	}
+
 	user := collector.user
 	password := collector.password
 
@@ -25,8 +28,8 @@ func newRegistry(collector *optionsCollector) Registry {
 		currentHTTPClient = &http.Client{}
 	}
 
-	return &registry{
-		url:         schemaRegistryURL,
+	r := &registry{
+		url:         url,
 		user:        user,
 		password:    password,
 		client:      currentHTTPClient,
@@ -34,6 +37,8 @@ func newRegistry(collector *optionsCollector) Registry {
 		mux:         &sync.RWMutex{},
 		tracerName:  tracerName,
 	}
+
+	return r, nil
 }
 
 type registry struct {

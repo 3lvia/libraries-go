@@ -10,6 +10,16 @@ import (
 	"testing"
 )
 
+func TestNew_noSchemaRegistryURL(t *testing.T) {
+	_, err := New("")
+	if err == nil {
+		t.Error("expected error")
+	}
+	if err.Error() != "schema registry URL is required" {
+		t.Errorf("expected error 'schema registry URL is required', got '%s'", err.Error())
+	}
+}
+
 func TestNew_internalServerError(t *testing.T) {
 	ctx := context.Background()
 
@@ -22,8 +32,8 @@ func TestNew_internalServerError(t *testing.T) {
 	server.Client()
 
 	r, err := New(
+		server.URL,
 		WithClient(server.Client()),
-		WithSchemaRegistryURL(server.URL),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -32,6 +42,9 @@ func TestNew_internalServerError(t *testing.T) {
 	_, err = r.GetBySubject(ctx, "private.dp.edna.examples")
 	if err == nil {
 		t.Error("expected error")
+	}
+	if err.Error() != "unexpected status code: 500" {
+		t.Errorf("expected error 'unexpected status code: 500', got '%s'", err.Error())
 	}
 
 	expectedSpans := []string{"mschema.get", "mschema.registry.GetBySubject"}
@@ -54,8 +67,8 @@ func TestNew_happyDays(t *testing.T) {
 	}))
 
 	r, err := New(
+		server.URL,
 		WithClient(server.Client()),
-		WithSchemaRegistryURL(server.URL),
 	)
 	if err != nil {
 		t.Fatal(err)
