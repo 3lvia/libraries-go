@@ -51,7 +51,7 @@ func TestNew_internalServerError(t *testing.T) {
 	checkSpans(expectedSpans, exporter, t)
 }
 
-func TestNew_happyDays(t *testing.T) {
+func TestNew_getBySubject_happyDays(t *testing.T) {
 	ctx := context.Background()
 
 	exporter := setTestOtel()
@@ -83,6 +83,42 @@ func TestNew_happyDays(t *testing.T) {
 	}
 
 	expectedSpans := []string{"mschema.get", "mschema.registry.GetBySubject"}
+	checkSpans(expectedSpans, exporter, t)
+}
+
+func TestNew_getByID_happyDays(t *testing.T) {
+	ctx := context.Background()
+
+	exporter := setTestOtel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/schemas/ids/2002" {
+			t.Fatal("wrong path")
+		}
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write([]byte(jsonSchema)); err != nil {
+			t.Fatal(err)
+		}
+	}))
+
+	r, err := New(
+		server.URL,
+		WithClient(server.Client()),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	id := 2002
+	d, err := r.GetByID(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if d.ID() != 100172 {
+		t.Errorf("expected ID 100172, got %d", d.ID())
+	}
+
+	expectedSpans := []string{"mschema.getById", "mschema.registry.GetByID"}
 	checkSpans(expectedSpans, exporter, t)
 }
 
