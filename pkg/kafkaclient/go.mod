@@ -4,7 +4,7 @@ go 1.21.0
 
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.1.1 // indirect
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230908094428-f9ffeeb9eb58 // indirect
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230909073237-48c720c411b5 // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect

@@ -1,6 +1,9 @@
 package kafkaclient
 
-import "context"
+import (
+	"context"
+	"github.com/3lvia/libraries-go/pkg/mschema"
+)
 
 // EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
 // of the consumer of this package to provide an implementation of this function.
@@ -29,4 +32,9 @@ type StreamingMessage struct {
 type StreamingMessageIterator interface {
 	Done() bool
 	Next(ctx context.Context) *StreamingMessage
+}
+
+type StreamingMessageFetcher interface {
+	Close()
+	PollFetches(ctx context.Context, format mschema.Type, creator EntityCreatorFunc) (StreamingMessageIterator, error)
 }

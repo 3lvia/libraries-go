@@ -27,11 +27,12 @@ func Start(ctx context.Context, system, topic string, opts ...Option) (<-chan *S
 		return nil, err
 	}
 
-	if err := mschema.Init(mschema.WithClient(c), mschema.WithUser(registryKey, registrySecret), mschema.WithSchemaRegistryURL(registryURL)); err != nil {
+	registry, err := mschema.New(registryURL, mschema.WithClient(c), mschema.WithUser(registryKey, registrySecret))
+	if err != nil {
 		return nil, err
 	}
 
-	schema, err := mschema.Get(topic)
+	schema, err := registry.GetBySubject(ctx, topic)
 	if err != nil {
 		return nil, err
 	}
