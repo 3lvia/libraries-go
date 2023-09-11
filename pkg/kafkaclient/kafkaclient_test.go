@@ -31,6 +31,13 @@ func TestStart(t *testing.T) {
 		}
 	}(errChan)
 
-	stream, err := Start(ctx, "edna", "private.dp.edna.examples", WithSecretsManager(v))
-	_ = stream
+	system := "edna"
+	topic := "private.dp.edna.examples"
+	groupID := "libraries-test"
+	clientID := "libraries-test"
+
+	stream, err := Start(ctx, system, topic, groupID, clientID, WithSecretsManager(v))
+
+	msg := <-stream
+	_ = msg
 }

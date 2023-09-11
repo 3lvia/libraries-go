@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func Start(ctx context.Context, system, topic string, opts ...Option) (<-chan *StreamingMessage, error) {
+func Start(ctx context.Context, system, topic, groupID, clientID string, opts ...Option) (<-chan *StreamingMessage, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
@@ -22,23 +22,36 @@ func Start(ctx context.Context, system, topic string, opts ...Option) (<-chan *S
 		c = &http.Client{}
 	}
 
-	registryKey, registrySecret, registryURL, err := getSecrets(ctx, system, collector.secrets)
+	cv, err := getSecrets(ctx, system, collector.secrets)
+	if err != nil {
+		return nil, err
+	}
+	_ = cv
+
+	creator := func(data []byte, schema string) interface{} {
+		return data
+	}
+
+	registry, err := mschema.New(cv.registryURL, mschema.WithClient(c), mschema.WithUser(cv.registryKey, cv.registrySecret))
 	if err != nil {
 		return nil, err
 	}
 
-	registry, err := mschema.New(registryURL, mschema.WithClient(c), mschema.WithUser(registryKey, registrySecret))
+	r, err := newReader(
+		topic,
+		cv.bootstrapServer,
+		groupID,
+		clientID,
+		cv.key,
+		cv.secret,
+		creator,
+		registry)
 	if err != nil {
 		return nil, err
 	}
-
-	schema, err := registry.GetBySubject(ctx, topic)
-	if err != nil {
-		return nil, err
-	}
-	_ = schema
 
 	ch := make(chan *StreamingMessage)
+	go r.start(ctx, ch)
 
 	return ch, nil
 }

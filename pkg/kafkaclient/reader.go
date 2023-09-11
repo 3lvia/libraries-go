@@ -30,7 +30,7 @@ func newReader(
 	clientID,
 	userName,
 	password string,
-	format mschema.Type,
+	//format mschema.Type,
 	entityCreator EntityCreatorFunc,
 	registry mschema.Registry) (reader, error) {
 	seeds := []string{broker}
@@ -59,7 +59,7 @@ func newReader(
 	}
 
 	f := &kafkaMessageFetcher{client: client, registry: registry}
-	r := &readerFranz{fetcher: f, entityCreator: entityCreator, format: format}
+	r := &readerFranz{fetcher: f, entityCreator: entityCreator}
 	return r, nil
 }
 

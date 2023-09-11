@@ -5,6 +5,14 @@ import (
 	"github.com/3lvia/libraries-go/pkg/mschema"
 )
 
+type AssignorType string
+
+const (
+	AssignorTypeSticky     AssignorType = "sticky"
+	AssignorTypeRange      AssignorType = "range"
+	AssignorTypeRoundRobin AssignorType = "roundrobin"
+)
+
 // EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
 // of the consumer of this package to provide an implementation of this function.
 type EntityCreatorFunc func(value []byte, schema string) any
