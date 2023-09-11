@@ -55,7 +55,7 @@ type descriptor struct {
 	S         string `json:"schema"`
 	ErrorCode int    `json:"error_code"`
 	Message   string `json:"message"`
-	T         string `json:"type"`
+	T         string `json:"schemaType"`
 }
 
 func (d descriptor) Subject() string {
