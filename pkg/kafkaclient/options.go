@@ -13,7 +13,9 @@ type optionsCollector struct {
 // Option is a function that can be used to configure this package.
 type Option func(*optionsCollector)
 
-// WithSecretsManager sets the secrets manager to use when fetching secrets.
+// WithSecretsManager sets the secrets manager to use when fetching secrets. In future versions, configuration via
+// environment variables may be supported, but for now, this is the only way to configure the package. Hence, it is
+// currently not really optional, and an error is returned if no secrets manager is provided in StartConsumer/Producer.
 func WithSecretsManager(secrets hashivault.SecretsManager) Option {
 	return func(o *optionsCollector) {
 		o.secrets = secrets

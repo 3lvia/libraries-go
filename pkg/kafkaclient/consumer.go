@@ -11,29 +11,33 @@ import (
 	"time"
 )
 
-type reader interface {
+type consumer interface {
 	start(ctx context.Context, output chan<- *StreamingMessage)
 }
 
-func newReaderFromFetcher(fetcher StreamingMessageFetcher, format mschema.Type, entityCreator EntityCreatorFunc) reader {
-	return &readerFranz{
+func newConsumerFromFetcher(fetcher StreamingMessageFetcher, format mschema.Type, entityCreator EntityCreatorFunc) consumer {
+	return &consumerFranz{
 		fetcher:       fetcher,
 		entityCreator: entityCreator,
 		format:        format,
 	}
 }
 
-func newReader(
+func newConsumer(
+	system,
 	topic,
+	application,
 	broker,
-	groupID,
-	clientID,
 	userName,
 	password string,
 	//format mschema.Type,
 	entityCreator EntityCreatorFunc,
-	registry mschema.Registry) (reader, error) {
+	registry mschema.Registry) (consumer, error) {
 	seeds := []string{broker}
+
+	consumerGroup := fmt.Sprintf("%s-%s.%s", topic, system, application)
+	// TODO: clientID should be unique for each instance of the consumer
+	clientID := "libraries-test"
 
 	tlsDialer := &tls.Dialer{NetDialer: &net.Dialer{Timeout: 10 * time.Second}}
 	opts := []kgo.Opt{
@@ -48,7 +52,7 @@ func newReader(
 		// Configure TLS. Uses SystemCertPool for RootCAs by default.
 		kgo.Dialer(tlsDialer.DialContext),
 
-		kgo.ConsumerGroup(groupID),
+		kgo.ConsumerGroup(consumerGroup),
 		kgo.ConsumeTopics(topic),
 		kgo.ClientID(clientID),
 	}
@@ -59,21 +63,21 @@ func newReader(
 	}
 
 	f := &kafkaMessageFetcher{client: client, registry: registry}
-	r := &readerFranz{fetcher: f, entityCreator: entityCreator}
+	r := &consumerFranz{fetcher: f, entityCreator: entityCreator}
 	return r, nil
 }
 
-type readerFranz struct {
+type consumerFranz struct {
 	fetcher       StreamingMessageFetcher
 	entityCreator EntityCreatorFunc
 	format        mschema.Type
 }
 
-func (r *readerFranz) start(ctx context.Context, output chan<- *StreamingMessage) {
-	defer r.fetcher.Close()
+func (c *consumerFranz) start(ctx context.Context, output chan<- *StreamingMessage) {
+	defer c.fetcher.Close()
 
 	for {
-		iter, err := r.fetcher.PollFetches(ctx, r.format, r.entityCreator)
+		iter, err := c.fetcher.PollFetches(ctx, c.format, c.entityCreator)
 		if err != nil {
 			fmt.Println(err)
 			continue

@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func Start(ctx context.Context, system, topic, groupID, clientID string, opts ...Option) (<-chan *StreamingMessage, error) {
+func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (<-chan *StreamingMessage, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
@@ -17,33 +17,35 @@ func Start(ctx context.Context, system, topic, groupID, clientID string, opts ..
 		return nil, errors.New("no secrets manager provided")
 	}
 
-	c := collector.client
-	if c == nil {
-		c = &http.Client{}
+	client := collector.client
+	if client == nil {
+		client = &http.Client{}
 	}
 
-	cv, err := getSecrets(ctx, system, collector.secrets)
+	secrets, err := getSecrets(ctx, system, collector.secrets)
 	if err != nil {
 		return nil, err
 	}
-	_ = cv
 
 	creator := func(data []byte, schema string) interface{} {
 		return data
 	}
 
-	registry, err := mschema.New(cv.registryURL, mschema.WithClient(c), mschema.WithUser(cv.registryKey, cv.registrySecret))
+	registry, err := mschema.New(
+		secrets.registryURL,
+		mschema.WithClient(client),
+		mschema.WithUser(secrets.registryKey, secrets.registrySecret))
 	if err != nil {
 		return nil, err
 	}
 
-	r, err := newReader(
+	c, err := newConsumer(
+		system,
 		topic,
-		cv.bootstrapServer,
-		groupID,
-		clientID,
-		cv.key,
-		cv.secret,
+		application,
+		secrets.bootstrapServer,
+		secrets.key,
+		secrets.secret,
 		creator,
 		registry)
 	if err != nil {
@@ -51,7 +53,7 @@ func Start(ctx context.Context, system, topic, groupID, clientID string, opts ..
 	}
 
 	ch := make(chan *StreamingMessage)
-	go r.start(ctx, ch)
+	go c.start(ctx, ch)
 
 	return ch, nil
 }
