@@ -135,7 +135,11 @@ func get(ctx context.Context, path, vaultAddress, token string, client *http.Cli
 
 // makeURL returns a correctly formatted url for Vault http requests
 func makeURL(address, path string) string {
-	return address + "/v1/" + path
+	v := "/v1/"
+	if address[len(address)-1:] == "/" {
+		v = "v1/"
+	}
+	return address + v + path
 }
 
 // secretsReq returns a http request for getting secrets from Vault

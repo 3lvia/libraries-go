@@ -39,3 +39,25 @@ func Test_manager_SetDefaultGoogleCredentials(t *testing.T) {
 		})
 	}
 }
+
+func Test_makeURL(t *testing.T) {
+	type args struct {
+		address string
+		path    string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"no slash", args{"http://localhost:8200", "foo"}, "http://localhost:8200/v1/foo"},
+		{"slash", args{"http://localhost:8200/", "foo"}, "http://localhost:8200/v1/foo"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := makeURL(tt.args.address, tt.args.path); got != tt.want {
+				t.Errorf("makeURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
