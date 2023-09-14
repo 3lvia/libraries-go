@@ -22,8 +22,9 @@ const (
 
 // listCmd represents the list command
 var (
-	url    string
-	system string
+	url        string
+	system     string
+	vaultToken string
 
 	listCmd = &cobra.Command{
 		Use:   "list",
@@ -43,6 +44,7 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.PersistentFlags().StringVar(&url, "url", defaultVaultURL, "Vault URL")
 	rootCmd.PersistentFlags().StringVar(&system, "system", "", "System")
+	rootCmd.PersistentFlags().StringVar(&vaultToken, "vaultToken", "", "Vault token")
 
 	rootCmd.AddCommand(listCmd)
 
@@ -66,11 +68,26 @@ func runList(ctx context.Context) {
 	var err error
 	var errChan <-chan error
 
-	token := os.Getenv("VAULT_TOKEN")
+	token := vaultToken
 	if token != "" {
-		secrets, errChan, err = hashivault.New(ctx, hashivault.WithVaultAddress(url), hashivault.WithVaultToken(token))
+		log.Printf("Using token from flag")
+		if err := os.Setenv("VAULT_TOKEN", token); err != nil {
+			log.Fatal(err)
+		}
+	}
+	if token == "" {
+		token = os.Getenv("VAULT_TOKEN")
+	}
+
+	vaultURL := url
+	if vaultURL == "" {
+		vaultURL = os.Getenv("VAULT_ADDR")
+	}
+
+	if token != "" {
+		secrets, errChan, err = hashivault.New(ctx, hashivault.WithVaultAddress(vaultURL), hashivault.WithVaultToken(token))
 	} else {
-		secrets, errChan, err = hashivault.New(ctx, hashivault.WithVaultAddress(url), hashivault.WithOIDC())
+		secrets, errChan, err = hashivault.New(ctx, hashivault.WithVaultAddress(vaultURL), hashivault.WithOIDC())
 	}
 
 	if err != nil {
@@ -86,6 +103,7 @@ func runList(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	m := infoSecret()
 	rURL := infoSecret()["schema-registry-url"].(string)
 	fmt.Printf("Schema registry URL: %s\n", rURL)
 
@@ -95,7 +113,7 @@ func runList(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	m := systemSecret()
+	m = systemSecret()
 	fmt.Printf("M: %v\n", m)
 	registryKey := m["schema_registry_key"].(string)
 	registrySecret := m["schema_registry_secret"].(string)

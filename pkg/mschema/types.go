@@ -1,3 +1,4 @@
+//go:generate $GOPATH/bin/stringer -type=Type
 package mschema
 
 import "context"
