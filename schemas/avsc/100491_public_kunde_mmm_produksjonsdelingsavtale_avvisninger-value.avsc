@@ -1,0 +1,1 @@
+{"type":"record","name":"ProduksjonsdelingsavtaleAvvisning","namespace":"Mmm.Schemas.Produksjonsdeling.V1","fields":[{"name":"ElviaId","type":{"type":"string","logicalType":"uuid"}},{"name":"ElviaVersjon","type":"int"},{"name":"Feilmeldinger","type":{"type":"array","items":"string"}}]}

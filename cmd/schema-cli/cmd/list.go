@@ -10,6 +10,8 @@ import (
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"log"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -22,9 +24,10 @@ const (
 
 // listCmd represents the list command
 var (
-	url        string
-	system     string
-	vaultToken string
+	url           string
+	system        string
+	vaultToken    string
+	storageFolder string
 
 	listCmd = &cobra.Command{
 		Use:   "list",
@@ -45,6 +48,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&url, "url", defaultVaultURL, "Vault URL")
 	rootCmd.PersistentFlags().StringVar(&system, "system", "", "System")
 	rootCmd.PersistentFlags().StringVar(&vaultToken, "vaultToken", "", "Vault token")
+
+	rootCmd.PersistentFlags().StringVar(&storageFolder, "storageFolder", "", "Storage folder")
 
 	rootCmd.AddCommand(listCmd)
 
@@ -124,7 +129,33 @@ func runList(ctx context.Context) {
 		log.Fatal(err)
 	}
 
+	store := storageFolder != ""
 	for _, descriptor := range descriptors {
 		fmt.Printf("%d\t%s\t%s\n", descriptor.ID(), descriptor.Subject(), mschema.TypeName(descriptor.Type()))
+		if store {
+			sf := storageFolder + "/avsc"
+			if descriptor.Type() != mschema.AVRO {
+				sf = storageFolder + "/json"
+			}
+			fn := path.Join(sf, descriptorFileName(descriptor))
+			f, err := os.Create(fn)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			if _, err := f.WriteString(descriptor.Schema()); err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
+}
+
+func descriptorFileName(d mschema.Descriptor) string {
+	sub := strings.Replace(d.Subject(), ".", "_", -1)
+	suffix := "json"
+	if d.Type() == mschema.AVRO {
+		suffix = "avsc"
+	}
+
+	return fmt.Sprintf("%d_%s.%s", d.ID(), sub, suffix)
 }

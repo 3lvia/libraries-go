@@ -1,0 +1,1 @@
+{"type":"record","name":"InternalDialogue","namespace":"kunde_extensions_external_data_api.Model","fields":[{"name":"CaseNumber","type":"int"},{"name":"Message","type":["null","string"],"default":null},{"name":"Sender","type":["null","string"],"default":null}]}

@@ -1,0 +1,1 @@
+{"type":"record","name":"Person","namespace":"Publisher.Model","fields":[{"name":"FirstName","type":["null","string"],"default":null},{"name":"Id","type":["null","string"],"default":null},{"name":"LastName","type":["null","string"],"default":null}]}

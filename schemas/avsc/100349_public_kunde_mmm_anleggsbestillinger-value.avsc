@@ -1,0 +1,1 @@
+{"type":"record","name":"Anleggsbestilling","namespace":"Mmm.Schemas.Anleggsbestilling.V1","fields":[{"name":"BestillingsId","type":{"type":"string","logicalType":"uuid"}},{"name":"BestillingsType","type":"string"},{"name":"Innflyttingsdato","type":{"type":"long","logicalType":"timestamp-millis"}},{"name":"MaalepunktId","type":["null","string"],"default":null}]}

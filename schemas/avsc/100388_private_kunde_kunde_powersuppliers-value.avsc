@@ -1,0 +1,1 @@
+{"type":"record","name":"PowerSupplier","namespace":"Kunde.Schema.Messages","fields":[{"name":"Id","type":["null","string"],"default":null},{"name":"Name","type":["null","string"],"default":null}]}

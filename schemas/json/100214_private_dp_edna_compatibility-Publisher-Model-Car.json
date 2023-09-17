@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-04/schema#","title":"Car","type":"object","additionalProperties":false,"properties":{"VIN":{"type":["null","string"]},"Brand":{"type":["null","string"]},"Model":{"type":["null","string"]}}}

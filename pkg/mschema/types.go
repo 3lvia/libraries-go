@@ -1,7 +1,11 @@
 //go:generate $GOPATH/bin/stringer -type=Type
 package mschema
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"strings"
+)
 
 // Type specifies how the schema is encoded.
 type Type int
@@ -47,11 +51,17 @@ type Descriptor interface {
 	// Subject returns the subject of the schema. For descriptors that originate from the Confluent schema registry,
 	// this is based on the topic name.
 	Subject() string
+
+	// Version returns the version of the schema.
+	Version() int
+
+	// GenerationFolder returns the folder where types that are generated from this schema should be stored.
+	GenerationFolder() (string, error)
 }
 
 type descriptor struct {
 	Subj      string `json:"subject"`
-	Version   int    `json:"version"`
+	V         int    `json:"version"`
 	I         int    `json:"id"`
 	S         string `json:"schema"`
 	ErrorCode int    `json:"error_code"`
@@ -69,6 +79,22 @@ func (d descriptor) ID() int {
 
 func (d descriptor) Schema() string {
 	return d.S
+}
+
+func (d descriptor) Version() int {
+	return d.V
+}
+
+func (d descriptor) GenerationFolder() (string, error) {
+	arr := strings.Split(d.Subj, ".")
+	if len(arr) != 4 {
+		return "", fmt.Errorf("invalid subject: %s", d.Subj)
+	}
+	typ := arr[len(arr)-1]
+	if strings.Contains(typ, "-value") {
+		typ = strings.Replace(typ, "-value", "", 1)
+	}
+	return fmt.Sprintf("%s/%s/%s/%s/", arr[1], arr[2], typ, arr[0]), nil
 }
 
 func (d descriptor) Type() Type {

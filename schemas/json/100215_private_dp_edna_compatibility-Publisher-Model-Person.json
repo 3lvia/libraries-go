@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-04/schema#","title":"Person","type":"object","additionalProperties":false,"properties":{"Id":{"type":["null","string"]},"FirstName":{"type":["null","string"]},"LastName":{"type":["null","string"]}}}

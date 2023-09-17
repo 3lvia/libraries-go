@@ -13,3 +13,5 @@ func New(url string, opts ...Option) (Registry, error) {
 	}
 	return r, nil
 }
+
+func Work() {}
