@@ -3,8 +3,12 @@ module github.com/3lvia/libraries-go/pkg/kafkaclient
 go 1.21.0
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.1.1 // indirect
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230909073237-48c720c411b5 // indirect
+	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230909073237-48c720c411b5
+	github.com/twmb/franz-go v1.14.4
+)
+
+require (
 	github.com/cenkalti/backoff/v3 v3.0.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
@@ -30,7 +34,6 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1 // indirect
-	github.com/twmb/franz-go v1.14.4 // indirect
 	github.com/twmb/franz-go/pkg/kmsg v1.6.1 // indirect
 	go.opentelemetry.io/otel v1.17.0 // indirect
 	go.opentelemetry.io/otel/metric v1.17.0 // indirect

@@ -1,5 +1,7 @@
 github.com/3lvia/libraries-go/pkg/hashivault v0.1.1 h1:EKzucC6NfGDcxQAmJRDR9cncMIyJtEpm7lS0jRMdBcM=
 github.com/3lvia/libraries-go/pkg/hashivault v0.1.1/go.mod h1:YH1kKbcrQ3T5Ii20fb9km0zmBhK8EdjeWyFXvkVB39I=
+github.com/3lvia/libraries-go/pkg/hashivault v0.1.2 h1:9k4NUeoj1NjczrB9b86Opo2XNw5zD13kDuV4GGu6Cn8=
+github.com/3lvia/libraries-go/pkg/hashivault v0.1.2/go.mod h1:YH1kKbcrQ3T5Ii20fb9km0zmBhK8EdjeWyFXvkVB39I=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230908094428-f9ffeeb9eb58 h1:Fl2sIVCA/RyhX4TQMmEgdol9wQdb0LMLxMWobQeSGt0=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230908094428-f9ffeeb9eb58/go.mod h1:yyedWAsj9OQhuiV5mvf0s3lfOmjP6HpmJzkDnHlV7U4=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230909073237-48c720c411b5 h1:NGztJr2A1+/6oEPWi3tWFlIuEWt0saF1eo8QCG2cSM8=

@@ -8,7 +8,11 @@ import (
 	"testing"
 )
 
-func TestStart(t *testing.T) {
+func Demo() {
+
+}
+
+func TestStartConsumer(t *testing.T) {
 	ctx := context.Background()
 
 	vaultAddr := "https://vault.dev-elvia.io"
