@@ -29,8 +29,8 @@ to quickly create a Cobra application.`,
 			if system == "" {
 				log.Fatal("system must be set")
 			}
-			if subject == "" {
-				log.Fatal("subject must be set")
+			if topic == "" {
+				log.Fatal("topic must be set")
 			}
 			runGenerate(cmd.Context())
 		},
@@ -63,10 +63,16 @@ func runGenerate(ctx context.Context) {
 	}(errChan)
 
 	all, err := registry.List(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	subject := topic + "-value"
 
 	var d mschema.Descriptor
 	ok := false
 	for _, v := range all {
+		fmt.Printf("Subject: %s\n", v.Subject())
 		if v.Subject() == subject {
 			d = v
 			ok = true
@@ -88,7 +94,13 @@ func runGenerate(ctx context.Context) {
 	}
 
 	dfn := descriptorFileName(d)
-	fmt.Printf("//go:generate $GOPATH/bin/mschema generate -s %s -d %s -t %s\n", subject, dfn, mschema.TypeName(d.Type()))
+	schemaFolder := "./json"
+	if d.Type() == mschema.AVRO {
+		schemaFolder = "./avsc"
+	}
+	fmt.Printf("//go:generate $GOPATH/bin/gogen-avro -containers %s %s/%s\n", gf, schemaFolder, dfn)
+
+	// //go:generate $GOPATH/bin/gogen-avro -containers ./avro ./avsc/100044_dp_examples-value.avsc
 }
 
 func writeFolderGenerations(folder string, w io.Writer) error {

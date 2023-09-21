@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-04/schema#","type":"object","properties":{"event_guid":{"type":"string"}},"required":["event_guid"]}

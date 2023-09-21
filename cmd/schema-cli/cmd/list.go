@@ -7,12 +7,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/3lvia/libraries-go/pkg/mschema"
+	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"path"
-	"strings"
-
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -85,11 +83,10 @@ func runList(ctx context.Context) {
 }
 
 func descriptorFileName(d mschema.Descriptor) string {
-	sub := strings.Replace(d.Subject(), ".", "_", -1)
 	suffix := "json"
 	if d.Type() == mschema.AVRO {
 		suffix = "avsc"
 	}
 
-	return fmt.Sprintf("%d_%s.%s", d.ID(), sub, suffix)
+	return fmt.Sprintf("%d_%d.%s", d.ID(), d.Version(), suffix)
 }
