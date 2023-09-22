@@ -9,8 +9,6 @@ import (
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
-	"path"
 )
 
 const (
@@ -61,24 +59,25 @@ func runList(ctx context.Context) {
 		log.Fatal(err)
 	}
 
-	store := storageFolder != ""
+	//store := storageFolder != ""
 	for _, descriptor := range descriptors {
-		fmt.Printf("%d\t%s\t%s\n", descriptor.ID(), descriptor.Subject(), mschema.TypeName(descriptor.Type()))
-		if store {
-			sf := storageFolder + "/avsc"
-			if descriptor.Type() != mschema.AVRO {
-				sf = storageFolder + "/json"
-			}
-			fn := path.Join(sf, descriptorFileName(descriptor))
-			f, err := os.Create(fn)
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer f.Close()
-			if _, err := f.WriteString(descriptor.Schema()); err != nil {
-				log.Fatal(err)
-			}
-		}
+		//fmt.Printf("%d\t%s\t%s\n", descriptor.ID(), descriptor.Subject(), mschema.TypeName(descriptor.Type()))
+		fmt.Println(descriptor.Subject())
+		//if store {
+		//	sf := storageFolder + "/avsc"
+		//	if descriptor.Type() != mschema.AVRO {
+		//		sf = storageFolder + "/json"
+		//	}
+		//	fn := path.Join(sf, descriptorFileName(descriptor))
+		//	f, err := os.Create(fn)
+		//	if err != nil {
+		//		log.Fatal(err)
+		//	}
+		//	defer f.Close()
+		//	if _, err := f.WriteString(descriptor.Schema()); err != nil {
+		//		log.Fatal(err)
+		//	}
+		//}
 	}
 }
 
