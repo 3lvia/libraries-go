@@ -3,8 +3,6 @@ package mschema
 
 import (
 	"context"
-	"fmt"
-	"strings"
 )
 
 // Type specifies how the schema is encoded.
@@ -32,8 +30,13 @@ func TypeName(t Type) string {
 
 // Registry is an interface that describes a schema registry. This is the main abstraction of this package.
 type Registry interface {
+	// GetByID returns a descriptor for the schema with the given ID.
 	GetByID(ctx context.Context, id int) (Descriptor, error)
+
+	// GetBySubject returns a descriptor for the latest version of the schema with the given subject.
 	GetBySubject(ctx context.Context, subject string) (Descriptor, error)
+
+	// List returns a list of all descriptors in the registry.
 	List(ctx context.Context) ([]Descriptor, error)
 }
 
@@ -54,9 +57,6 @@ type Descriptor interface {
 
 	// Version returns the version of the schema.
 	Version() int
-
-	// GenerationFolder returns the folder where types that are generated from this schema should be stored.
-	GenerationFolder() (string, error)
 }
 
 type descriptor struct {
@@ -83,18 +83,6 @@ func (d descriptor) Schema() string {
 
 func (d descriptor) Version() int {
 	return d.V
-}
-
-func (d descriptor) GenerationFolder() (string, error) {
-	arr := strings.Split(d.Subj, ".")
-	if len(arr) != 4 {
-		return "", fmt.Errorf("invalid subject: %s", d.Subj)
-	}
-	typ := arr[len(arr)-1]
-	if strings.Contains(typ, "-value") {
-		typ = strings.Replace(typ, "-value", "", 1)
-	}
-	return fmt.Sprintf("%s/%s/%s/%s/", arr[1], arr[2], typ, arr[0]), nil
 }
 
 func (d descriptor) Type() Type {

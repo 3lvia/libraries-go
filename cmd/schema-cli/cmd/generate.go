@@ -84,7 +84,7 @@ func runGenerate(ctx context.Context) {
 		log.Fatal("Subject not found")
 	}
 
-	gf, err := d.GenerationFolder()
+	gf, err := getGenerationFolder(d)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,4 +118,16 @@ func writeFolderGenerations(folder string, w io.Writer) error {
 		}
 	}
 	return nil
+}
+
+func getGenerationFolder(d mschema.Descriptor) (string, error) {
+	arr := strings.Split(d.Subject(), ".")
+	if len(arr) != 4 {
+		return "", fmt.Errorf("invalid subject: %s", d.Subject())
+	}
+	typ := arr[len(arr)-1]
+	if strings.Contains(typ, "-value") {
+		typ = strings.Replace(typ, "-value", "", 1)
+	}
+	return fmt.Sprintf("%s/%s/%s/%s/", arr[1], arr[2], typ, arr[0]), nil
 }
