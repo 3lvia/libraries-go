@@ -30,6 +30,7 @@ type pathComputerImpl struct {
 func (p *pathComputerImpl) addSubject(subject string) {
 	s := strings.Replace(subject, "-", "_", -1)
 	s = strings.ToLower(s)
+	s = strings.TrimSpace(s)
 
 	if len(s) > len("_value") && s[len(s)-len("_value"):] == "_value" {
 		s = s[:len(s)-len("_value")]
@@ -38,7 +39,8 @@ func (p *pathComputerImpl) addSubject(subject string) {
 	i := strings.Index(s, ".")
 	if i == -1 {
 		p.nodes[s] = &pathComputerImpl{
-			path: s,
+			path:  s,
+			nodes: map[string]*pathComputerImpl{},
 		}
 		return
 	}

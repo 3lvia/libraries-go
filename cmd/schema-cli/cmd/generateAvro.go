@@ -4,9 +4,12 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"context"
+	"fmt"
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -59,10 +62,20 @@ func runGenerateAvro(ctx context.Context) {
 		log.Fatal(err)
 	}
 
+	pc := newPathComputer("")
 	var avroSchemas []mschema.Descriptor
 	for _, schema := range all {
 		if schema.Type() == mschema.AVRO {
 			avroSchemas = append(avroSchemas, schema)
+			pc.addSubject(schema.Subject())
 		}
+	}
+
+	w := bufio.NewWriter(os.Stdout)
+
+	paths := pc.sortedPaths()
+	for _, path := range paths {
+		fmt.Fprintf(w, "//go:generate mkdir -p %s\n", path)
+		//go:generate mkdir -p ./dp
 	}
 }
