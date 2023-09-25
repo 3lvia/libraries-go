@@ -15,7 +15,7 @@ const (
 
 // EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
 // of the consumer of this package to provide an implementation of this function.
-type EntityCreatorFunc func(value []byte, schema string) any
+type EntityCreatorFunc func(value []byte, schemaID int) any
 
 // StreamingMessage represents a message that has been read from Kafka. Som pre-processing has been done
 // on the message, such as decoding the message value from Avro.

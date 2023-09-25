@@ -27,8 +27,12 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		return nil, err
 	}
 
-	creator := func(data []byte, schema string) interface{} {
-		return data
+	creator := collector.creatorFunc
+
+	if creator == nil {
+		creator = func(data []byte, schemaID int) interface{} {
+			return data
+		}
 	}
 
 	registry, err := mschema.New(

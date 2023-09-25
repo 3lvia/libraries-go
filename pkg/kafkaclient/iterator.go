@@ -43,25 +43,23 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 
 	b := record.Value
 	schemaID := 0
-	var d mschema.Descriptor
-	s := ""
+	//var d mschema.Descriptor
+	//s := ""
 	var err error
-	if i.format == mschema.AVRO {
-		id := b[1:5]
-		schemaID = int(binary.BigEndian.Uint32(id))
+	id := b[1:5]
+	schemaID = int(binary.BigEndian.Uint32(id))
 
-		d, err = i.registry.GetByID(ctx, schemaID)
-		if d != nil {
-			s = d.Schema()
-		}
+	//d, err = i.registry.GetByID(ctx, schemaID)
+	//if d != nil {
+	//	s = d.Schema()
+	//}
 
-		b = b[5:]
-	}
+	b = b[5:]
 
 	return &StreamingMessage{
 		Key:      record.Key,
 		SchemaID: schemaID,
-		Value:    i.creator(b, s),
+		Value:    i.creator(b, schemaID),
 		Headers:  headers,
 		Error:    err,
 	}
