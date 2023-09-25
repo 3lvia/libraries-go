@@ -28,10 +28,9 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 	}
 
 	creator := collector.creatorFunc
-
 	if creator == nil {
-		creator = func(data []byte, schemaID int) interface{} {
-			return data
+		creator = func(data []byte, schemaID int) (any, error) {
+			return data, nil
 		}
 	}
 

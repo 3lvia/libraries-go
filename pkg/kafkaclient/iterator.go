@@ -38,6 +38,9 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 
 	if f, ok := headers["IsFake"]; ok && strings.ToLower(f) == "true" {
 		//i.tw.IncFakeMessages(ctx, 1)
+		v, err := i.creator(record.Value[5:], 1)
+		_ = err
+		_ = v
 		return nil
 	}
 
@@ -56,10 +59,12 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 
 	b = b[5:]
 
+	v, err := i.creator(b, schemaID)
+
 	return &StreamingMessage{
 		Key:      record.Key,
 		SchemaID: schemaID,
-		Value:    i.creator(b, schemaID),
+		Value:    v,
 		Headers:  headers,
 		Error:    err,
 	}

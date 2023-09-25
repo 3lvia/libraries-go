@@ -1,4 +1,4 @@
-module github.com/3lvia/libraries-go/schemas
+module github.com/3lvia/libraries-go/pkg/schemas
 
 go 1.21.0
 

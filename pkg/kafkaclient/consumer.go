@@ -54,6 +54,7 @@ func newConsumer(
 
 		kgo.ConsumerGroup(consumerGroup),
 		kgo.ConsumeTopics(topic),
+		//kgo.ConsumeResetOffset(),
 		kgo.ClientID(clientID),
 	}
 
