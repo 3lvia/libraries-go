@@ -1,1 +1,0 @@
-{"type":"record","name":"MeteringpointAndTariff","namespace":"GridTariff.Events.V1","fields":[{"name":"MeteringPointId","type":["null","string"],"default":null},{"name":"Product","type":["null","string"],"default":null},{"name":"TariffKey","type":["null","string"],"default":null}]}

@@ -1,1 +1,0 @@
-{"type":"record","name":"JobEventDto","namespace":"Application.Job.Dto","fields":[{"name":"BroadcastId","type":["null","string"],"default":null},{"name":"JobId","type":["null","string"],"default":null},{"name":"Status","type":{"type":"enum","name":"JobEventStatus","namespace":"Application.Common.Enums","symbols":["Received","Modified","Started","Canceled","Finished"]}}]}

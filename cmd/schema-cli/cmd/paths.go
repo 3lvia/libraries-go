@@ -86,3 +86,26 @@ func (p *pathComputerImpl) addPaths(parent string, accumulator []string) []strin
 	}
 	return accumulator
 }
+
+func subjectToPath(subject string) string {
+	s := strings.Replace(subject, "-", "_", -1)
+	s = strings.ToLower(s)
+	s = strings.TrimSpace(s)
+
+	if len(s) > len("_value") && s[len(s)-len("_value"):] == "_value" {
+		s = s[:len(s)-len("_value")]
+	}
+
+	i := strings.Index(s, ".")
+	if i == -1 {
+		return s
+	}
+
+	k := s[:i]
+	if k == "private" || k == "public" {
+		s = s[i+1:]
+		i = strings.Index(s, ".")
+		k = s[:i] + "/" + k
+	}
+	return k + "/" + strings.Replace(s[i+1:], ".", "/", -1)
+}

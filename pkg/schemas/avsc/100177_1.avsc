@@ -1,1 +1,0 @@
-{"type":"record","name":"AnnualConsumption","namespace":"Mdmx.CloudEvents.Shared.PublisherDto","fields":[{"name":"CreatedAt","type":"string"},{"name":"Estimation","type":"int"},{"name":"MeteringPointId","type":["null","string"],"default":null}]}

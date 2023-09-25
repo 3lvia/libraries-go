@@ -1,1 +1,0 @@
-{"type":"record","name":"WithEnumVersion","namespace":"Elvia.Edna.Events.Tests.SerializationTests","fields":[{"name":"MyValue","type":{"type":"enum","name":"MyType","symbols":["Value1","Value2"],"default":"Value2"}}]}

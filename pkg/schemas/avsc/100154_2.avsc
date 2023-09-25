@@ -1,1 +1,0 @@
-{"type":"record","name":"MyModel","namespace":"DemoPublisher","fields":[{"name":"Code","type":["null","int"],"default":null},{"name":"CreatedDate","type":"string"},{"name":"Id","type":["null","string"],"default":null},{"name":"Name","type":["null","string"],"default":null}]}

@@ -10,6 +10,7 @@ import (
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"log"
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 )
@@ -27,6 +28,9 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if system == "" {
 			log.Fatal("system must be set")
+		}
+		if storageFolder == "" {
+			log.Fatal("storageFolder must be set")
 		}
 		runGenerateAvro(cmd.Context())
 	},
@@ -75,7 +79,31 @@ func runGenerateAvro(ctx context.Context) {
 
 	paths := pc.sortedPaths()
 	for _, path := range paths {
+		if path == "" {
+			continue
+		}
 		fmt.Fprintf(w, "//go:generate mkdir -p %s\n", path)
 		//go:generate mkdir -p ./dp
 	}
+	for _, d := range avroSchemas {
+		subjPath := subjectToPath(d.Subject())
+		fmt.Fprintf(w, "//go:generate $GOPATH/bin/gogen-avro -containers %s ./avsc/%d_%d.avsc\n", subjPath, d.ID(), d.Version())
+
+		if err := storeSchema(d); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func storeSchema(d mschema.Descriptor) error {
+	fn := path.Join(storageFolder, fmt.Sprintf("%d_%d.avsc", d.ID(), d.Version()))
+	f, err := os.Create(fn)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := f.WriteString(d.Schema()); err != nil {
+		return err
+	}
+	return nil
 }

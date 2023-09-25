@@ -54,3 +54,26 @@ func Test_newPathComputer_multiPath(t *testing.T) {
 		t.Errorf("Expected %v, got %v", expectedPatsh, ps)
 	}
 }
+
+func Test_subjectToPath(t *testing.T) {
+	type args struct {
+		subject string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"empty", args{""}, ""},
+		{"public", args{"public.kunde.gridtariff.meteringpointtariffss-value"}, "kunde/public/gridtariff/meteringpointtariffss"},
+		{"private", args{"private.dp.edna.compatibility-value"}, "dp/private/edna/compatibility"},
+		{"no modifier", args{"just.some.path"}, "just/some/path"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := subjectToPath(tt.args.subject); got != tt.want {
+				t.Errorf("subjectToPath() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
