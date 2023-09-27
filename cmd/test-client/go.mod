@@ -6,10 +6,12 @@ require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2 // indirect
 	github.com/3lvia/libraries-go/pkg/kafkaclient v0.0.1 // indirect
 	github.com/3lvia/libraries-go/pkg/mschema v0.0.0-20230909073237-48c720c411b5 // indirect
+	github.com/actgardner/gogen-avro/v10 v10.2.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/cap v0.3.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -24,6 +26,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/vault/api v1.10.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/linkedin/goavro v2.1.0+incompatible // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect

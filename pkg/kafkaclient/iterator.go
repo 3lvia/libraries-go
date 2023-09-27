@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"github.com/3lvia/libraries-go/pkg/mschema"
+	"github.com/linkedin/goavro/v2"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"strings"
 )
@@ -45,17 +46,19 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 	}
 
 	b := record.Value
+
 	schemaID := 0
-	//var d mschema.Descriptor
-	//s := ""
 	var err error
 	id := b[1:5]
 	schemaID = int(binary.BigEndian.Uint32(id))
 
-	//d, err = i.registry.GetByID(ctx, schemaID)
-	//if d != nil {
-	//	s = d.Schema()
-	//}
+	var d mschema.Descriptor
+	d, err = i.registry.GetByID(ctx, schemaID)
+
+	codec, err := goavro.NewCodec(d.Schema())
+	obj, bb, err := codec.NativeFromBinary(b[5:])
+	_ = obj
+	_ = bb
 
 	b = b[5:]
 
