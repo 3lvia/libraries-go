@@ -6,6 +6,7 @@ import (
 	"github.com/3lvia/libraries-go/cmd/test-client/model"
 	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"github.com/3lvia/libraries-go/pkg/kafkaclient"
+	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/actgardner/gogen-avro/v10/soe"
 	"github.com/linkedin/goavro/v2"
 	"log"
@@ -16,7 +17,7 @@ import (
 func main() {
 	topic()
 	//write()
-
+	//
 	//fn := `/Users/staleheitmann/go/src/github.com/3lvia/libraries-go/cmd/test-client/message.byt`
 	//if err := goAvro(fn); err != nil {
 	//	log.Fatal(err)
@@ -124,13 +125,13 @@ func topic() {
 		log.Fatal(err)
 	}
 
-	//creator := func(data []byte, schemaID int) (any, error) {
-	//	p, err := model.DeserializePerson(bytes.NewReader(data))
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	return p, nil
-	//}
+	creator := func(data []byte, d mschema.Descriptor) (any, error) {
+		p, err := model.DeserializePerson(bytes.NewReader(data))
+		if err != nil {
+			return nil, err
+		}
+		return p, nil
+	}
 
 	go func(ec <-chan error) {
 		for err := range ec {
@@ -142,7 +143,7 @@ func topic() {
 	topic := "private.dp.edna.examples"
 	application := "democonsumer-2"
 
-	stream, err := kafkaclient.StartConsumer(ctx, system, topic, application, kafkaclient.WithSecretsManager(v)) // kafkaclient.WithEntityCreatorFunc(creator)
+	stream, err := kafkaclient.StartConsumer(ctx, system, topic, application, kafkaclient.WithSecretsManager(v), kafkaclient.WithEntityCreatorFunc(creator)) // kafkaclient.WithEntityCreatorFunc(creator)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(100)
