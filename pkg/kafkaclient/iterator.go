@@ -4,32 +4,29 @@ import (
 	"context"
 	"encoding/binary"
 	"github.com/3lvia/libraries-go/pkg/mschema"
-	"github.com/linkedin/goavro/v2"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"strings"
 )
 
-func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, format mschema.Type, registry mschema.Registry) StreamingMessageIterator {
-	return &streamingMessageIterator{
+func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, registry mschema.Registry) StreamingMessageIterator {
+	return &messageIterator{
 		iter:     iter,
 		creator:  creator,
-		format:   format,
 		registry: registry,
 	}
 }
 
-type streamingMessageIterator struct {
+type messageIterator struct {
 	iter     *kgo.FetchesRecordIter
 	creator  EntityCreatorFunc
-	format   mschema.Type
 	registry mschema.Registry
 }
 
-func (i *streamingMessageIterator) Done() bool {
+func (i *messageIterator) Done() bool {
 	return i.iter.Done()
 }
 
-func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
+func (i *messageIterator) Next(ctx context.Context) *StreamingMessage {
 	record := i.iter.Next()
 
 	headers := map[string]string{}
@@ -39,9 +36,6 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 
 	if f, ok := headers["IsFake"]; ok && strings.ToLower(f) == "true" {
 		//i.tw.IncFakeMessages(ctx, 1)
-		v, err := i.creator(record.Value[5:], 1)
-		_ = err
-		_ = v
 		return nil
 	}
 
@@ -52,17 +46,9 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 	id := b[1:5]
 	schemaID = int(binary.BigEndian.Uint32(id))
 
-	var d mschema.Descriptor
-	d, err = i.registry.GetByID(ctx, schemaID)
+	d, err := i.registry.GetByID(ctx, schemaID)
 
-	codec, err := goavro.NewCodec(d.Schema())
-	obj, bb, err := codec.NativeFromBinary(b[5:])
-	_ = obj
-	_ = bb
-
-	b = b[5:]
-
-	v, err := i.creator(b, schemaID)
+	v, err := i.creator(b[5:], d)
 
 	return &StreamingMessage{
 		Key:      record.Key,

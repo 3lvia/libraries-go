@@ -2,6 +2,7 @@ package kafkaclient
 
 import (
 	"github.com/3lvia/libraries-go/pkg/hashivault"
+	"github.com/3lvia/libraries-go/pkg/mschema"
 	"net/http"
 )
 
@@ -9,6 +10,8 @@ type optionsCollector struct {
 	secrets     hashivault.SecretsManager
 	creatorFunc EntityCreatorFunc
 	client      *http.Client
+	format      mschema.Type
+	formatSet   bool
 }
 
 // Option is a function that can be used to configure this package.
@@ -36,5 +39,13 @@ func WithEntityCreatorFunc(creator EntityCreatorFunc) Option {
 func WithHTTPClient(client *http.Client) Option {
 	return func(o *optionsCollector) {
 		o.client = client
+	}
+}
+
+// WithFormat sets the format to use when consuming messages. If not set, AVRO will be used as the default format.
+func WithFormat(format mschema.Type) Option {
+	return func(o *optionsCollector) {
+		o.format = format
+		o.formatSet = true
 	}
 }

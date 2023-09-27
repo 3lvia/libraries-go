@@ -124,13 +124,13 @@ func topic() {
 		log.Fatal(err)
 	}
 
-	creator := func(data []byte, schemaID int) (any, error) {
-		p, err := model.DeserializePerson(bytes.NewReader(data))
-		if err != nil {
-			return nil, err
-		}
-		return p, nil
-	}
+	//creator := func(data []byte, schemaID int) (any, error) {
+	//	p, err := model.DeserializePerson(bytes.NewReader(data))
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	return p, nil
+	//}
 
 	go func(ec <-chan error) {
 		for err := range ec {
@@ -142,7 +142,7 @@ func topic() {
 	topic := "private.dp.edna.examples"
 	application := "democonsumer-2"
 
-	stream, err := kafkaclient.StartConsumer(ctx, system, topic, application, kafkaclient.WithSecretsManager(v), kafkaclient.WithEntityCreatorFunc(creator))
+	stream, err := kafkaclient.StartConsumer(ctx, system, topic, application, kafkaclient.WithSecretsManager(v)) // kafkaclient.WithEntityCreatorFunc(creator)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(100)
