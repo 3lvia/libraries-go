@@ -17,13 +17,19 @@ import (
 // generateAvroCmd represents the generateAvro command
 var generateAvroCmd = &cobra.Command{
 	Use:   "generateAvro",
-	Short: "Generates go source code for all schemas in the Confluent registry that are of type AVRO.",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Generates go source code for one specified schema from the Confluent registry.",
+	Long: `Generates go source code for one specified schema from the Confluent registry. The schema can be specified by 
+either topic or schemaID. SchemaID takes precedence.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+The generated code is written to the directory that is given through the option 'storageFolder', if no such option is
+given, the current directory is used. 
+
+Rather than generating the code directly, a go:generate comment is written to a file in the storage folder. This file
+can be used to generate the code by running 'go generate' in the storage folder. Along with the go:generate comment, an
+'avsc' file is written to the storage folder. This file contains the schema in avro format. This file is referenced in
+the go:generate comment. The file name is <schemaID>_<version>.avsc.
+`,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		if system == "" {
 			log.Fatal("system must be set")
