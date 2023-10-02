@@ -8,6 +8,7 @@ import (
 func creatorFunc(format mschema.Type, collector *optionsCollector) EntityCreatorFunc {
 	creator := collector.creatorFunc
 	if creator != nil {
+		// If the client has provided a custom creator function, we use that, regardless of the format.
 		return creator
 	}
 	if format == mschema.AVRO {
