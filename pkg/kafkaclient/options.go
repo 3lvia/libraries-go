@@ -2,6 +2,7 @@ package kafkaclient
 
 import (
 	"github.com/3lvia/libraries-go/pkg/hashivault"
+	"github.com/3lvia/libraries-go/pkg/mschema"
 	"net/http"
 )
 
@@ -9,6 +10,8 @@ type optionsCollector struct {
 	secrets     hashivault.SecretsManager
 	creatorFunc EntityCreatorFunc
 	client      *http.Client
+	format      mschema.Type
+	formatSet   bool
 }
 
 // Option is a function that can be used to configure this package.
@@ -36,5 +39,35 @@ func WithEntityCreatorFunc(creator EntityCreatorFunc) Option {
 func WithHTTPClient(client *http.Client) Option {
 	return func(o *optionsCollector) {
 		o.client = client
+	}
+}
+
+// UseAVRO sets the message format to AVRO. The reason for setting the format at all is so that the package can
+// provide a default implementation of the EntityCreatorFunc. If the client provides a custom implementation of
+// EntityCreatorFunc, the format is not used.
+func UseAVRO() Option {
+	return func(o *optionsCollector) {
+		o.format = mschema.AVRO
+		o.formatSet = true
+	}
+}
+
+// UseJSON sets the message format to JSON. The reason for setting the format at all is so that the package can
+// provide a default implementation of the EntityCreatorFunc. If the client provides a custom implementation of
+// EntityCreatorFunc, the format is not used.
+func UseJSON() Option {
+	return func(o *optionsCollector) {
+		o.format = mschema.JSON
+		o.formatSet = true
+	}
+}
+
+// UseProtobuf sets the message format to Protobuf. The reason for setting the format at all is so that the package can
+// provide a default implementation of the EntityCreatorFunc. If the client provides a custom implementation of
+// EntityCreatorFunc, the format is not used.
+func UseProtobuf() Option {
+	return func(o *optionsCollector) {
+		o.format = mschema.PROTOBUF
+		o.formatSet = true
 	}
 }

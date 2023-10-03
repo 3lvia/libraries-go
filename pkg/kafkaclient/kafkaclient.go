@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+const defaultFormat = mschema.AVRO
+
 func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (<-chan *StreamingMessage, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
@@ -27,10 +29,6 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		return nil, err
 	}
 
-	creator := func(data []byte, schema string) interface{} {
-		return data
-	}
-
 	registry, err := mschema.New(
 		secrets.registryURL,
 		mschema.WithClient(client),
@@ -39,6 +37,13 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		return nil, err
 	}
 
+	format := collector.format
+	if !collector.formatSet {
+		format = defaultFormat
+	}
+
+	creator := creatorFunc(format, collector)
+
 	c, err := newConsumer(
 		system,
 		topic,
@@ -46,6 +51,7 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		secrets.bootstrapServer,
 		secrets.key,
 		secrets.secret,
+		format,
 		creator,
 		registry)
 	if err != nil {

@@ -8,6 +8,13 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
+func newFetcher(client *kgo.Client, registry mschema.Registry) StreamingMessageFetcher {
+	return &kafkaMessageFetcher{
+		client:   client,
+		registry: registry,
+	}
+}
+
 type kafkaMessageFetcher struct {
 	client   *kgo.Client
 	registry mschema.Registry
@@ -32,6 +39,7 @@ func (f *kafkaMessageFetcher) PollFetches(ctx context.Context, format mschema.Ty
 		}
 	})
 
-	it := newIterator(fetches.RecordIter(), creator, format, f.registry)
+	it := newIterator(fetches.RecordIter(), creator, f.registry)
+
 	return it, nil
 }

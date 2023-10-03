@@ -30,7 +30,7 @@ func newConsumer(
 	broker,
 	userName,
 	password string,
-	//format mschema.Type,
+	format mschema.Type,
 	entityCreator EntityCreatorFunc,
 	registry mschema.Registry) (consumer, error) {
 	seeds := []string{broker}
@@ -54,6 +54,7 @@ func newConsumer(
 
 		kgo.ConsumerGroup(consumerGroup),
 		kgo.ConsumeTopics(topic),
+		//kgo.ConsumeResetOffset(),
 		kgo.ClientID(clientID),
 	}
 
@@ -62,8 +63,8 @@ func newConsumer(
 		return nil, err
 	}
 
-	f := &kafkaMessageFetcher{client: client, registry: registry}
-	r := &consumerFranz{fetcher: f, entityCreator: entityCreator}
+	f := newFetcher(client, registry)
+	r := &consumerFranz{fetcher: f, entityCreator: entityCreator, format: format}
 	return r, nil
 }
 

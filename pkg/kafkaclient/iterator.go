@@ -8,27 +8,25 @@ import (
 	"strings"
 )
 
-func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, format mschema.Type, registry mschema.Registry) StreamingMessageIterator {
-	return &streamingMessageIterator{
+func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, registry mschema.Registry) StreamingMessageIterator {
+	return &messageIterator{
 		iter:     iter,
 		creator:  creator,
-		format:   format,
 		registry: registry,
 	}
 }
 
-type streamingMessageIterator struct {
+type messageIterator struct {
 	iter     *kgo.FetchesRecordIter
 	creator  EntityCreatorFunc
-	format   mschema.Type
 	registry mschema.Registry
 }
 
-func (i *streamingMessageIterator) Done() bool {
+func (i *messageIterator) Done() bool {
 	return i.iter.Done()
 }
 
-func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
+func (i *messageIterator) Next(ctx context.Context) *StreamingMessage {
 	record := i.iter.Next()
 
 	headers := map[string]string{}
@@ -42,26 +40,20 @@ func (i *streamingMessageIterator) Next(ctx context.Context) *StreamingMessage {
 	}
 
 	b := record.Value
+
 	schemaID := 0
-	var d mschema.Descriptor
-	s := ""
 	var err error
-	if i.format == mschema.AVRO {
-		id := b[1:5]
-		schemaID = int(binary.BigEndian.Uint32(id))
+	id := b[1:5]
+	schemaID = int(binary.BigEndian.Uint32(id))
 
-		d, err = i.registry.GetByID(ctx, schemaID)
-		if d != nil {
-			s = d.Schema()
-		}
+	d, err := i.registry.GetByID(ctx, schemaID)
 
-		b = b[5:]
-	}
+	v, err := i.creator(b[5:], d)
 
 	return &StreamingMessage{
 		Key:      record.Key,
 		SchemaID: schemaID,
-		Value:    i.creator(b, s),
+		Value:    v,
 		Headers:  headers,
 		Error:    err,
 	}
