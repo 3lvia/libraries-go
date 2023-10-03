@@ -4,7 +4,8 @@ go 1.21.0
 
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.1
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.2
+	github.com/linkedin/goavro/v2 v2.12.0
 	github.com/twmb/franz-go v1.14.4
 )
 
@@ -28,7 +29,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/vault/api v1.10.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
-	github.com/linkedin/goavro/v2 v2.12.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
