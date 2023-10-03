@@ -12,7 +12,7 @@
 //
 // If UseAVRO is used (and no EntityCreatorFunc is provided), the message is decoded using the schema that is provided
 // with the message. The actual schema is then fetched from the schema registry via the mschema library. The
-// functionality of the packaged 'github.com/linkedin/goavro/v2' is used to decode the message dynamically, returning
+// functionality of the package 'github.com/linkedin/goavro/v2' is used to decode the message dynamically, returning
 // a map[string]interface{} (which probably will be nested for each contained value).
 //
 // If no EntityCreatorFunc is provided, and UseAVRO is not used, the message is returned as is, i.e. the raw byte
@@ -69,7 +69,23 @@
 // topic := "private.dp.edna.examples"
 // application := "democonsumer-2"
 //
-// stream, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v))
+//	creator := func(data []byte, d mschema.Descriptor) (any, error) {
+//	  p, err := model.DeserializePerson(bytes.NewReader(data))
+//			if err != nil {
+//				return nil, err
+//			}
+//			return p, nil
+//		}
+//
+// stream, err := StartConsumer(
+//
+//	         ctx,
+//	         system,
+//	         topic,
+//	         application,
+//	         kafkaclient.WithSecretsManager(v),
+//	         kafkaclient.WithEntityCreatorFunc(creator),
+//	)
 //
 // msg := <-stream // here you would have a for-loop handling the messages from the stream forever.
 // ```
