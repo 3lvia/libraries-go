@@ -13,6 +13,9 @@ const (
 	AssignorTypeRoundRobin AssignorType = "roundrobin"
 )
 
+// Starter is a function that starts a Kafka consumer and returns a channel on which messages.
+type Starter func(ctx context.Context) <-chan *StreamingMessage
+
 // EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
 // of the consumer of this package to provide an implementation of this function.
 type EntityCreatorFunc func(value []byte, d mschema.Descriptor) (any, error)

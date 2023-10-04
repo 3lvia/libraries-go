@@ -2,13 +2,8 @@ package kafkaclient
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"github.com/3lvia/libraries-go/pkg/mschema"
-	"github.com/twmb/franz-go/pkg/kgo"
-	"github.com/twmb/franz-go/pkg/sasl/plain"
-	"net"
-	"time"
 )
 
 type consumer interface {
@@ -26,43 +21,23 @@ func newConsumerFromFetcher(fetcher StreamingMessageFetcher, format mschema.Type
 func newConsumer(
 	system,
 	topic,
-	application,
-	broker,
-	userName,
-	password string,
+	application string,
+	info kafkaClientInfo,
 	format mschema.Type,
 	entityCreator EntityCreatorFunc,
 	registry mschema.Registry,
 	offsetSender chan<- OffsetInfo) (consumer, error) {
-	seeds := []string{broker}
 
 	consumerGroup := fmt.Sprintf("%s-%s.%s", topic, system, application)
-	// TODO: clientID should be unique for each instance of the consumer
-	clientID := "libraries-test"
-
-	tlsDialer := &tls.Dialer{NetDialer: &net.Dialer{Timeout: 10 * time.Second}}
-	opts := []kgo.Opt{
-		kgo.SeedBrokers(seeds...),
-
-		// SASL Options
-		kgo.SASL(plain.Auth{
-			User: userName,
-			Pass: password,
-		}.AsMechanism()),
-
-		// Configure TLS. Uses SystemCertPool for RootCAs by default.
-		kgo.Dialer(tlsDialer.DialContext),
-
-		kgo.ConsumerGroup(consumerGroup),
-		kgo.ConsumeTopics(topic),
-		//kgo.ConsumeResetOffset(),
-		kgo.ClientID(clientID),
-	}
-
-	client, err := kgo.NewClient(opts...)
+	client, err := fetchClient(topic, consumerGroup, info)
 	if err != nil {
 		return nil, err
 	}
+
+	//admClient := kadm.NewClient(client)
+	//admClient.
+
+	//client.SetOffsets()
 
 	f := newFetcher(client, registry, offsetSender)
 	r := &consumerFranz{fetcher: f, entityCreator: entityCreator, format: format}

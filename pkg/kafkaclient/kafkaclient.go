@@ -11,7 +11,7 @@ const defaultFormat = mschema.AVRO
 
 func Hello() {}
 
-func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (<-chan *StreamingMessage, error) {
+func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (Starter, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
@@ -46,13 +46,24 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 
 	creator := creatorFunc(format, collector)
 
+	info := kafkaClientInfo{
+		broker:   secrets.bootstrapServer,
+		userName: secrets.key,
+		password: secrets.secret,
+		clientID: "libraries-test", // TODO: clientID should be unique for each instance of the consumer
+		// should be fetched from Kuberenetes
+	}
+
+	//kClient, err := fetchClient(topic, application, info)
+	//if err != nil {
+	//	return nil, err
+	//}
+
 	c, err := newConsumer(
 		system,
 		topic,
 		application,
-		secrets.bootstrapServer,
-		secrets.key,
-		secrets.secret,
+		info,
 		format,
 		creator,
 		registry,
@@ -61,8 +72,11 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		return nil, err
 	}
 
-	ch := make(chan *StreamingMessage)
-	go c.start(ctx, ch)
+	starter := func(ctx context.Context) <-chan *StreamingMessage {
+		ch := make(chan *StreamingMessage)
+		go c.start(ctx, ch)
+		return ch
+	}
 
-	return ch, nil
+	return starter, nil
 }
