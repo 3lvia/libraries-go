@@ -8,16 +8,18 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
-func newFetcher(client *kgo.Client, registry mschema.Registry) StreamingMessageFetcher {
+func newFetcher(client *kgo.Client, registry mschema.Registry, offsetSender chan<- OffsetInfo) StreamingMessageFetcher {
 	return &kafkaMessageFetcher{
-		client:   client,
-		registry: registry,
+		client:       client,
+		registry:     registry,
+		offsetSender: offsetSender,
 	}
 }
 
 type kafkaMessageFetcher struct {
-	client   *kgo.Client
-	registry mschema.Registry
+	client       *kgo.Client
+	registry     mschema.Registry
+	offsetSender chan<- OffsetInfo
 }
 
 func (f *kafkaMessageFetcher) Close() {
@@ -33,11 +35,18 @@ func (f *kafkaMessageFetcher) PollFetches(ctx context.Context, format mschema.Ty
 		return nil, errors.New(msg)
 	}
 
-	fetches.EachTopic(func(ft kgo.FetchTopic) {
-		for _, partition := range ft.Partitions {
-			fmt.Printf("topic %s partition %d high watermark %d\n", ft.Topic, partition.Partition, partition.HighWatermark)
-		}
-	})
+	if f.offsetSender != nil {
+		fetches.EachTopic(func(ft kgo.FetchTopic) {
+			for _, partition := range ft.Partitions {
+				offset := OffsetInfo{
+					Topic:     ft.Topic,
+					Partition: partition.Partition,
+					Offset:    partition.HighWatermark,
+				}
+				f.offsetSender <- offset
+			}
+		})
+	}
 
 	it := newIterator(fetches.RecordIter(), creator, f.registry)
 

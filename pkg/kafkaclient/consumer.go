@@ -32,7 +32,8 @@ func newConsumer(
 	password string,
 	format mschema.Type,
 	entityCreator EntityCreatorFunc,
-	registry mschema.Registry) (consumer, error) {
+	registry mschema.Registry,
+	offsetSender chan<- OffsetInfo) (consumer, error) {
 	seeds := []string{broker}
 
 	consumerGroup := fmt.Sprintf("%s-%s.%s", topic, system, application)
@@ -63,7 +64,7 @@ func newConsumer(
 		return nil, err
 	}
 
-	f := newFetcher(client, registry)
+	f := newFetcher(client, registry, offsetSender)
 	r := &consumerFranz{fetcher: f, entityCreator: entityCreator, format: format}
 	return r, nil
 }

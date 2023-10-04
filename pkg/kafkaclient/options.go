@@ -7,11 +7,12 @@ import (
 )
 
 type optionsCollector struct {
-	secrets     hashivault.SecretsManager
-	creatorFunc EntityCreatorFunc
-	client      *http.Client
-	format      mschema.Type
-	formatSet   bool
+	secrets      hashivault.SecretsManager
+	creatorFunc  EntityCreatorFunc
+	client       *http.Client
+	format       mschema.Type
+	formatSet    bool
+	offsetSender chan<- OffsetInfo
 }
 
 // Option is a function that can be used to configure this package.
@@ -69,5 +70,12 @@ func UseProtobuf() Option {
 	return func(o *optionsCollector) {
 		o.format = mschema.PROTOBUF
 		o.formatSet = true
+	}
+}
+
+// WithOffsetSender sets the channel to use when sending offsets. If not set, no offsets will be sent.
+func WithOffsetSender(offsetSender chan<- OffsetInfo) Option {
+	return func(o *optionsCollector) {
+		o.offsetSender = offsetSender
 	}
 }

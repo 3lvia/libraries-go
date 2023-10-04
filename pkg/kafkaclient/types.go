@@ -46,3 +46,15 @@ type StreamingMessageFetcher interface {
 	Close()
 	PollFetches(ctx context.Context, format mschema.Type, creator EntityCreatorFunc) (StreamingMessageIterator, error)
 }
+
+// OffsetInfo represents the offset of a message in Kafka.
+type OffsetInfo struct {
+	// Topic is the topic of the message.
+	Topic string
+
+	// Partition is the partition of the message.
+	Partition int32
+
+	// Offset is the offset of the message.
+	Offset int64
+}

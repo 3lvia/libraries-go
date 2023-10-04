@@ -9,6 +9,8 @@ import (
 
 const defaultFormat = mschema.AVRO
 
+func Hello() {}
+
 func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (<-chan *StreamingMessage, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
@@ -53,7 +55,8 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		secrets.secret,
 		format,
 		creator,
-		registry)
+		registry,
+		collector.offsetSender)
 	if err != nil {
 		return nil, err
 	}
