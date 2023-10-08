@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/3lvia/libraries-go/pkg/mschema"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 type consumer interface {
@@ -19,25 +20,11 @@ func newConsumerFromFetcher(fetcher StreamingMessageFetcher, format mschema.Type
 }
 
 func newConsumer(
-	system,
-	topic,
-	application string,
-	info kafkaClientInfo,
+	client *kgo.Client,
 	format mschema.Type,
 	entityCreator EntityCreatorFunc,
 	registry mschema.Registry,
 	offsetSender chan<- OffsetInfo) (consumer, error) {
-
-	consumerGroup := fmt.Sprintf("%s-%s.%s", topic, system, application)
-	client, err := fetchClient(topic, consumerGroup, info)
-	if err != nil {
-		return nil, err
-	}
-
-	//admClient := kadm.NewClient(client)
-	//admClient.
-
-	//client.SetOffsets()
 
 	f := newFetcher(client, registry, offsetSender)
 	r := &consumerFranz{fetcher: f, entityCreator: entityCreator, format: format}

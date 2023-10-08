@@ -9,16 +9,16 @@ import (
 
 const defaultFormat = mschema.AVRO
 
-func Hello() {}
-
-func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (Starter, error) {
+func StartConsumer(ctx context.Context, system, topic, application string, opts ...Option) (Starter, AdminClient, func(), error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
 	}
 
+	emptyCloser := func() {}
+
 	if collector.secrets == nil {
-		return nil, errors.New("no secrets manager provided")
+		return nil, nil, emptyCloser, errors.New("no secrets manager provided")
 	}
 
 	client := collector.client
@@ -28,7 +28,7 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 
 	secrets, err := getSecrets(ctx, system, collector.secrets)
 	if err != nil {
-		return nil, err
+		return nil, nil, emptyCloser, err
 	}
 
 	registry, err := mschema.New(
@@ -36,7 +36,7 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		mschema.WithClient(client),
 		mschema.WithUser(secrets.registryKey, secrets.registrySecret))
 	if err != nil {
-		return nil, err
+		return nil, nil, emptyCloser, err
 	}
 
 	format := collector.format
@@ -54,22 +54,24 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		// should be fetched from Kuberenetes
 	}
 
-	//kClient, err := fetchClient(topic, application, info)
-	//if err != nil {
-	//	return nil, err
-	//}
+	kClient, err := fetchClient(topic, application, info)
+	if err != nil {
+		return nil, nil, emptyCloser, err
+	}
 
 	c, err := newConsumer(
-		system,
-		topic,
-		application,
-		info,
+		kClient,
 		format,
 		creator,
 		registry,
 		collector.offsetSender)
 	if err != nil {
-		return nil, err
+		return nil, nil, kClient.Close, err
+	}
+
+	admClient, admCloser, err := newAdminClient(application, kClient)
+	if err != nil {
+		return nil, nil, kClient.Close, err
 	}
 
 	starter := func(ctx context.Context) <-chan *StreamingMessage {
@@ -78,5 +80,10 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		return ch
 	}
 
-	return starter, nil
+	finalCloser := func() {
+		admCloser()
+		kClient.Close()
+	}
+
+	return starter, admClient, finalCloser, nil
 }
