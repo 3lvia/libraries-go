@@ -1,15 +1,20 @@
-module github.com/3lvia/libraries-go/pkg/kafkaclient3
+module github.com/3lvia/libraries-go/pkg/kafkaclient
 
 go 1.21.0
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2 // indirect
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.2 // indirect
+	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.2
+	github.com/confluentinc/confluent-kafka-go v1.9.2
+	github.com/linkedin/goavro/v2 v2.11.1
+)
+
+require (
 	github.com/cenkalti/backoff/v3 v3.0.0 // indirect
-	github.com/confluentinc/confluent-kafka-go v1.9.2 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/cap v0.3.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect

@@ -1,6 +1,9 @@
 package kafkaclient
 
-import "time"
+import (
+	"github.com/3lvia/libraries-go/pkg/mschema"
+	"time"
+)
 
 // StreamingMessage represents a message that has been read from Kafka. Som pre-processing has been done
 // on the message, such as decoding the message value from Avro.
@@ -27,6 +30,10 @@ type StreamingMessage struct {
 	// String is a string representation of the message on the format "TOPIC[PARTITION]@OFFSET"
 	String string
 }
+
+// EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
+// of the consumer of this package to provide an implementation of this function.
+type EntityCreatorFunc func(value []byte, d mschema.Descriptor) (any, error)
 
 type apiKey struct {
 	key, secret string

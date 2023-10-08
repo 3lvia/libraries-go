@@ -1,4 +1,4 @@
-module github.com/3lvia/libraries-go/pkg/kafkaclient
+module github.com/3lvia/libraries-go/pkg/kafkaclientfranz
 
 go 1.21.0
 

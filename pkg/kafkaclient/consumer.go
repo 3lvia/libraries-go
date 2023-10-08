@@ -8,7 +8,12 @@ import (
 	"strings"
 )
 
-func startConsumer(ctx context.Context, topic, consumerGroup string, registry mschema.Registry, format mschema.Type, c kafka.ConfigMap) (<-chan *StreamingMessage, func() error, error) {
+func startConsumer(
+	ctx context.Context,
+	topic, consumerGroup string,
+	creator EntityCreatorFunc,
+	registry mschema.Registry,
+	c kafka.ConfigMap) (<-chan *StreamingMessage, func() error, error) {
 	c["group.id"] = consumerGroup
 	c["auto.offset.reset"] = "earliest"
 	kafkaConsumer, err := kafka.NewConsumer(&c)
@@ -22,8 +27,8 @@ func startConsumer(ctx context.Context, topic, consumerGroup string, registry ms
 
 	worker := &consumer{
 		registry:      registry,
-		format:        format,
 		kafkaConsumer: kafkaConsumer,
+		creator:       creator,
 	}
 
 	ch := make(chan *StreamingMessage)
@@ -34,8 +39,8 @@ func startConsumer(ctx context.Context, topic, consumerGroup string, registry ms
 
 type consumer struct {
 	registry      mschema.Registry
-	format        mschema.Type
 	kafkaConsumer *kafka.Consumer
+	creator       EntityCreatorFunc
 }
 
 func (c *consumer) consume(ctx context.Context, output chan<- *StreamingMessage) {
@@ -46,14 +51,14 @@ func (c *consumer) consume(ctx context.Context, output chan<- *StreamingMessage)
 			continue
 		}
 
-		sm := streamingMessage(ctx, msg, c.registry)
+		sm := streamingMessage(ctx, msg, c.registry, c.creator)
 		if sm != nil {
 			output <- sm
 		}
 	}
 }
 
-func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.Registry) *StreamingMessage {
+func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.Registry, creator EntityCreatorFunc) *StreamingMessage {
 	if msg == nil {
 		return nil
 	}
@@ -75,12 +80,35 @@ func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.
 	schemaID = int(binary.BigEndian.Uint32(id))
 
 	d, err := registry.GetByID(ctx, schemaID)
-	_ = d
+	if err != nil {
+		return &StreamingMessage{
+			Key:       msg.Key,
+			SchemaID:  schemaID,
+			Value:     b,
+			Headers:   headers,
+			Error:     err,
+			Timestamp: msg.Timestamp,
+			String:    msg.String(),
+		}
+	}
+
+	transformed, err := creator(b, d)
+	if err != nil {
+		return &StreamingMessage{
+			Key:       msg.Key,
+			SchemaID:  schemaID,
+			Value:     b,
+			Headers:   headers,
+			Error:     err,
+			Timestamp: msg.Timestamp,
+			String:    msg.String(),
+		}
+	}
 
 	return &StreamingMessage{
 		Key:       msg.Key,
 		SchemaID:  schemaID,
-		Value:     b,
+		Value:     transformed,
 		Headers:   headers,
 		Error:     err,
 		Timestamp: msg.Timestamp,

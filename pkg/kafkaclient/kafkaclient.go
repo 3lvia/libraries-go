@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/linkedin/goavro/v2"
 	"net/http"
 )
 
@@ -36,12 +37,11 @@ func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opt
 		return nil, nil, err
 	}
 
-	// TODO: Make configurable
-	format := mschema.AVRO
+	creator := creatorFunc(collector)
 
 	c := config(secrets)
 
-	ch, closer, err := startConsumer(ctx, topic, consumerGroup, registry, format, c)
+	ch, closer, err := startConsumer(ctx, topic, consumerGroup, creator, registry, c)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -57,4 +57,33 @@ func config(secrets *secretConfigValues) kafka.ConfigMap {
 		"sasl.password":     secrets.secret,
 		"acks":              "all",
 	}
+}
+
+func creatorFunc(collector *optionsCollector) EntityCreatorFunc {
+	creator := collector.creatorFunc
+	if creator != nil {
+		// If the client has provided a custom creator function, we use that, regardless of the format.
+		return creator
+	}
+	if collector.formatSet && collector.format == mschema.AVRO {
+		// Since collector.creatorFunc == nil, and the schema is AVRO, we use dynamic typing.
+		return defaultAVROCreator
+	}
+
+	// The default creator function simply returns the raw byte slice from the Kafka message.
+	return func(data []byte, d mschema.Descriptor) (any, error) {
+		return data, nil
+	}
+}
+
+func defaultAVROCreator(value []byte, d mschema.Descriptor) (any, error) {
+	codec, err := goavro.NewCodec(d.Schema())
+	if err != nil {
+		return nil, err
+	}
+	obj, _, err := codec.NativeFromBinary(value)
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
 }
