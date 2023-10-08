@@ -1,24 +1,6 @@
 package kafkaclient
 
-import (
-	"context"
-	"github.com/3lvia/libraries-go/pkg/mschema"
-)
-
-type AssignorType string
-
-const (
-	AssignorTypeSticky     AssignorType = "sticky"
-	AssignorTypeRange      AssignorType = "range"
-	AssignorTypeRoundRobin AssignorType = "roundrobin"
-)
-
-// Starter is a function that starts a Kafka consumer and returns a channel on which messages.
-type Starter func(ctx context.Context) <-chan *StreamingMessage
-
-// EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
-// of the consumer of this package to provide an implementation of this function.
-type EntityCreatorFunc func(value []byte, d mschema.Descriptor) (any, error)
+import "time"
 
 // StreamingMessage represents a message that has been read from Kafka. Som pre-processing has been done
 // on the message, such as decoding the message value from Avro.
@@ -38,26 +20,14 @@ type StreamingMessage struct {
 
 	// Error is the error that occurred while processing the message.
 	Error error
+
+	// Timestamp is the timestamp of the message as it was stored in Kafka.
+	Timestamp time.Time
+
+	// String is a string representation of the message on the format "TOPIC[PARTITION]@OFFSET"
+	String string
 }
 
-type StreamingMessageIterator interface {
-	Done() bool
-	Next(ctx context.Context) *StreamingMessage
-}
-
-type StreamingMessageFetcher interface {
-	Close()
-	PollFetches(ctx context.Context, format mschema.Type, creator EntityCreatorFunc) (StreamingMessageIterator, error)
-}
-
-// OffsetInfo represents the offset of a message in Kafka.
-type OffsetInfo struct {
-	// Topic is the topic of the message.
-	Topic string
-
-	// Partition is the partition of the message.
-	Partition int32
-
-	// Offset is the offset of the message.
-	Offset int64
+type apiKey struct {
+	key, secret string
 }

@@ -1,4 +1,4 @@
-package kafkaclient
+package kafkaclientfranz
 
 import (
 	"github.com/3lvia/libraries-go/pkg/mschema"

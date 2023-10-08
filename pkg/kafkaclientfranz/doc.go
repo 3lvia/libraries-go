@@ -1,4 +1,4 @@
-// Package kafkaclient provides a way to communicate with Kafka "the Elvia way", meaning that all the mechanics of
+// Package kafkaclientfranz provides a way to communicate with Kafka "the Elvia way", meaning that all the mechanics of
 // negotiating with the Kafka cluster, fetching schemas from the schema registry, and decoding messages are handled
 // automatically. The only thing the user needs to do is to provide a function that can create the entities that the
 // messages are decoded into (if not opting for the defaults implemented internally).
@@ -53,7 +53,7 @@
 //	   return p, nil
 //	}
 //
-// v, errChan, err := hashivault.New(hashivault.WithOIDC(), hashivault.WithVaultAddress("https://vault.dev-elvia.io"), kafkaclient.WithEntityCreatorFunc(creator))
+// v, errChan, err := hashivault.New(hashivault.WithOIDC(), hashivault.WithVaultAddress("https://vault.dev-elvia.io"), kafkaclientfranz.WithEntityCreatorFunc(creator))
 //
 //	if err != nil {
 //	  log.Fatal(err)
@@ -83,10 +83,10 @@
 //	         system,
 //	         topic,
 //	         application,
-//	         kafkaclient.WithSecretsManager(v),
-//	         kafkaclient.WithEntityCreatorFunc(creator),
+//	         kafkaclientfranz.WithSecretsManager(v),
+//	         kafkaclientfranz.WithEntityCreatorFunc(creator),
 //	)
 //
 // msg := <-stream // here you would have a for-loop handling the messages from the stream forever.
 // ```
-package kafkaclient
+package kafkaclientfranz

@@ -1,4 +1,4 @@
-package kafkaclient3
+package kafkaclientfranz
 
 import (
 	"context"
@@ -11,7 +11,7 @@ const (
 	secretPathPatternRegistry = "edna/kv/data/cloudevents/creds/%s"
 )
 
-func getSecrets(ctx context.Context, system string, secrets hashivault.SecretsManager, key *apiKey) (*secretConfigValues, error) {
+func getSecrets(ctx context.Context, system string, secrets hashivault.SecretsManager) (*secretConfigValues, error) {
 	secret, err := secrets.GetSecret(ctx, fmt.Sprintf(secretPathPatternRegistry, system))
 	if err != nil {
 		return nil, err
@@ -49,11 +49,6 @@ func getSecrets(ctx context.Context, system string, secrets hashivault.SecretsMa
 		environment:        mInfo["environment"].(string),
 		kafkaEnvID:         mInfo["kafa-env-id"].(string),
 		kafkaMainClusterID: mInfo["kafa-main-cluster-id"].(string),
-	}
-
-	if key != nil {
-		cv.key = key.key
-		cv.secret = key.secret
 	}
 
 	return cv, nil

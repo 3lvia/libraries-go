@@ -1,0 +1,81 @@
+package kafkaclientfranz
+
+import (
+	"github.com/3lvia/libraries-go/pkg/hashivault"
+	"github.com/3lvia/libraries-go/pkg/mschema"
+	"net/http"
+)
+
+type optionsCollector struct {
+	secrets      hashivault.SecretsManager
+	creatorFunc  EntityCreatorFunc
+	client       *http.Client
+	format       mschema.Type
+	formatSet    bool
+	offsetSender chan<- OffsetInfo
+}
+
+// Option is a function that can be used to configure this package.
+type Option func(*optionsCollector)
+
+// WithSecretsManager sets the secrets manager to use when fetching secrets. In future versions, configuration via
+// environment variables may be supported, but for now, this is the only way to configure the package. Hence, it is
+// currently not really optional, and an error is returned if no secrets manager is provided in StartConsumer/Producer.
+func WithSecretsManager(secrets hashivault.SecretsManager) Option {
+	return func(o *optionsCollector) {
+		o.secrets = secrets
+	}
+}
+
+// WithEntityCreatorFunc sets the function to use when creating entities from messages. If not set, the default
+// implementation will be used, which simply returns the message data as is, i.e. the raw byte slice from the Kafka
+// message.
+func WithEntityCreatorFunc(creator EntityCreatorFunc) Option {
+	return func(o *optionsCollector) {
+		o.creatorFunc = creator
+	}
+}
+
+// WithHTTPClient sets the HTTP client to use when communicating with the schema registry.
+func WithHTTPClient(client *http.Client) Option {
+	return func(o *optionsCollector) {
+		o.client = client
+	}
+}
+
+// UseAVRO sets the message format to AVRO. The reason for setting the format at all is so that the package can
+// provide a default implementation of the EntityCreatorFunc. If the client provides a custom implementation of
+// EntityCreatorFunc, the format is not used.
+func UseAVRO() Option {
+	return func(o *optionsCollector) {
+		o.format = mschema.AVRO
+		o.formatSet = true
+	}
+}
+
+// UseJSON sets the message format to JSON. The reason for setting the format at all is so that the package can
+// provide a default implementation of the EntityCreatorFunc. If the client provides a custom implementation of
+// EntityCreatorFunc, the format is not used.
+func UseJSON() Option {
+	return func(o *optionsCollector) {
+		o.format = mschema.JSON
+		o.formatSet = true
+	}
+}
+
+// UseProtobuf sets the message format to Protobuf. The reason for setting the format at all is so that the package can
+// provide a default implementation of the EntityCreatorFunc. If the client provides a custom implementation of
+// EntityCreatorFunc, the format is not used.
+func UseProtobuf() Option {
+	return func(o *optionsCollector) {
+		o.format = mschema.PROTOBUF
+		o.formatSet = true
+	}
+}
+
+// WithOffsetSender sets the channel to use when sending offsets. If not set, no offsets will be sent.
+func WithOffsetSender(offsetSender chan<- OffsetInfo) Option {
+	return func(o *optionsCollector) {
+		o.offsetSender = offsetSender
+	}
+}
