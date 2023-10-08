@@ -38,10 +38,11 @@ func TestStartConsumer(t *testing.T) {
 	topic := "private.dp.edna.examples"
 	application := "democonsumer-1"
 
-	stream, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v), WithAPIKey(confluentKey, confluentSecret))
+	stream, closer, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v), WithAPIKey(confluentKey, confluentSecret))
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer closer()
 
 	wg := sync.WaitGroup{}
 	wg.Add(100)

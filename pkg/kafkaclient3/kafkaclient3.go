@@ -8,14 +8,14 @@ import (
 	"net/http"
 )
 
-func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opts ...Option) (<-chan *StreamingMessage, error) {
+func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opts ...Option) (<-chan *StreamingMessage, func() error, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
 		opt(collector)
 	}
 
 	if collector.secrets == nil {
-		return nil, errors.New("no secrets manager provided")
+		return nil, nil, errors.New("no secrets manager provided")
 	}
 
 	client := collector.client
@@ -25,7 +25,7 @@ func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opt
 
 	secrets, err := getSecrets(ctx, system, collector.secrets, collector.key)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	registry, err := mschema.New(
@@ -33,7 +33,7 @@ func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opt
 		mschema.WithClient(client),
 		mschema.WithUser(secrets.registryKey, secrets.registrySecret))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// TODO: Make configurable
@@ -41,11 +41,11 @@ func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opt
 
 	c := config(secrets)
 
-	ch, err := startConsumer(ctx, topic, consumerGroup, registry, format, c)
+	ch, closer, err := startConsumer(ctx, topic, consumerGroup, registry, format, c)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return ch, nil
+	return ch, closer, nil
 }
 
 func config(secrets *secretConfigValues) kafka.ConfigMap {
