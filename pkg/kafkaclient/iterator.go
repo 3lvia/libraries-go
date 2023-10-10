@@ -3,10 +3,15 @@ package kafkaclient
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"strings"
 
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/twmb/franz-go/pkg/kgo"
+)
+
+var (
+	ErrNoDescriptor = errors.New("could not get the descriptor")
 )
 
 func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, format mschema.Type, registry mschema.Registry) StreamingMessageIterator {
@@ -44,19 +49,27 @@ func (i *messageIterator) Next(ctx context.Context) *StreamingMessage {
 	b := record.Value
 
 	schemaID := 0
-	var d mschema.Descriptor
-
+	var v any
 	var err error
-	if i.format == mschema.AVRO {
+
+	switch i.format {
+	case mschema.AVRO:
 		id := b[1:5]
 
 		schemaID = int(binary.BigEndian.Uint32(id))
+
+		var d mschema.Descriptor
 		d, err = i.registry.GetByID(ctx, schemaID)
 
-		b = b[5:]
+		if err != nil {
+			err = errors.Join(ErrNoDescriptor, err)
+		} else {
+			v, err = i.creator(b[5:], d)
+		}
+	default:
+		var d mschema.Descriptor
+		v, err = i.creator(b, d)
 	}
-
-	v, err := i.creator(b, d)
 
 	return &StreamingMessage{
 		Key:      record.Key,
