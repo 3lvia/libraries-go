@@ -3,12 +3,13 @@ package kafkaclient
 import (
 	"context"
 	"encoding/binary"
+	"strings"
+
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/twmb/franz-go/pkg/kgo"
-	"strings"
 )
 
-func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, registry mschema.Registry) StreamingMessageIterator {
+func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, format mschema.Type, registry mschema.Registry) StreamingMessageIterator {
 	return &messageIterator{
 		iter:     iter,
 		creator:  creator,
@@ -19,6 +20,7 @@ func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, registr
 type messageIterator struct {
 	iter     *kgo.FetchesRecordIter
 	creator  EntityCreatorFunc
+	format   mschema.Type
 	registry mschema.Registry
 }
 
@@ -35,20 +37,26 @@ func (i *messageIterator) Next(ctx context.Context) *StreamingMessage {
 	}
 
 	if f, ok := headers["IsFake"]; ok && strings.ToLower(f) == "true" {
-		//i.tw.IncFakeMessages(ctx, 1)
+		// i.tw.IncFakeMessages(ctx, 1)
 		return nil
 	}
 
 	b := record.Value
 
 	schemaID := 0
+	var d mschema.Descriptor
+
 	var err error
-	id := b[1:5]
-	schemaID = int(binary.BigEndian.Uint32(id))
+	if i.format == mschema.AVRO {
+		id := b[1:5]
 
-	d, err := i.registry.GetByID(ctx, schemaID)
+		schemaID = int(binary.BigEndian.Uint32(id))
+		d, err = i.registry.GetByID(ctx, schemaID)
 
-	v, err := i.creator(b[5:], d)
+		b = b[5:]
+	}
+
+	v, err := i.creator(b, d)
 
 	return &StreamingMessage{
 		Key:      record.Key,
