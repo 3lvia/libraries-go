@@ -10,12 +10,11 @@ import (
 
 func startConsumer(
 	ctx context.Context,
-	topic, consumerGroup string,
+	topic string,
 	creator EntityCreatorFunc,
 	registry mschema.Registry,
+	returnFakes bool,
 	c kafka.ConfigMap) (<-chan *StreamingMessage, func() error, error) {
-	c["group.id"] = consumerGroup
-	c["auto.offset.reset"] = "earliest"
 	kafkaConsumer, err := kafka.NewConsumer(&c)
 	if err != nil {
 		return nil, nil, err
@@ -29,10 +28,11 @@ func startConsumer(
 		registry:      registry,
 		kafkaConsumer: kafkaConsumer,
 		creator:       creator,
+		returnFakes:   returnFakes,
 	}
 
 	ch := make(chan *StreamingMessage)
-	go worker.consume(ctx, ch)
+	go worker.start(ctx, ch)
 
 	return ch, kafkaConsumer.Close, nil
 }
@@ -41,24 +41,26 @@ type consumer struct {
 	registry      mschema.Registry
 	kafkaConsumer *kafka.Consumer
 	creator       EntityCreatorFunc
+	returnFakes   bool
 }
 
-func (c *consumer) consume(ctx context.Context, output chan<- *StreamingMessage) {
+func (c *consumer) start(ctx context.Context, output chan<- *StreamingMessage) {
 	for {
-		msg, err := c.kafkaConsumer.ReadMessage(-1) // TODO: Make configurable
+		msg, err := c.kafkaConsumer.ReadMessage(-1) // TODO: Make configurable?
 		if err != nil {
 			output <- &StreamingMessage{Error: err}
 			continue
 		}
 
-		sm := streamingMessage(ctx, msg, c.registry, c.creator)
+		sm := streamingMessage(ctx, msg, c.registry, c.creator, c.returnFakes)
+
 		if sm != nil {
 			output <- sm
 		}
 	}
 }
 
-func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.Registry, creator EntityCreatorFunc) *StreamingMessage {
+func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.Registry, creator EntityCreatorFunc, returnFakes bool) *StreamingMessage {
 	if msg == nil {
 		return nil
 	}
@@ -68,8 +70,13 @@ func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.
 		headers[header.Key] = string(header.Value)
 	}
 
+	isFake := false
+
 	if f, ok := headers["IsFake"]; ok && strings.ToLower(f) == "true" {
-		//i.tw.IncFakeMessages(ctx, 1)
+		isFake = true
+	}
+
+	if isFake && !returnFakes {
 		return nil
 	}
 
@@ -89,6 +96,7 @@ func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.
 			Error:     err,
 			Timestamp: msg.Timestamp,
 			String:    msg.String(),
+			IsFake:    isFake,
 		}
 	}
 
@@ -102,6 +110,7 @@ func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.
 			Error:     err,
 			Timestamp: msg.Timestamp,
 			String:    msg.String(),
+			IsFake:    isFake,
 		}
 	}
 
@@ -113,5 +122,6 @@ func streamingMessage(ctx context.Context, msg *kafka.Message, registry mschema.
 		Error:     err,
 		Timestamp: msg.Timestamp,
 		String:    msg.String(),
+		IsFake:    isFake,
 	}
 }

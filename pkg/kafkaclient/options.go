@@ -6,13 +6,23 @@ import (
 	"net/http"
 )
 
+type autoOffsetResetType int
+
+const (
+	autoOffsetResetNone autoOffsetResetType = iota
+	autoOffsetResetEarliest
+	autoOffsetResetLateset
+)
+
 type optionsCollector struct {
-	secrets     hashivault.SecretsManager
-	client      *http.Client
-	key         *apiKey
-	creatorFunc EntityCreatorFunc
-	format      mschema.Type
-	formatSet   bool
+	secrets         hashivault.SecretsManager
+	client          *http.Client
+	key             *apiKey
+	creatorFunc     EntityCreatorFunc
+	format          mschema.Type
+	formatSet       bool
+	returnFakes     bool
+	autoOffsetReset autoOffsetResetType
 }
 
 // Option is a function that can be used to configure this package.
@@ -78,5 +88,29 @@ func UseProtobuf() Option {
 	return func(o *optionsCollector) {
 		o.format = mschema.PROTOBUF
 		o.formatSet = true
+	}
+}
+
+// ReturnFakes sets the client to return fakes messages from the topic. To be clear, these are real messages thar are
+// fetched from the topic, but they are marked as fake. The default behaviour is to suppress these messages.
+func ReturnFakes() Option {
+	return func(o *optionsCollector) {
+		o.returnFakes = true
+	}
+}
+
+// AutoOffsetResetEarliest sets the client to automatically reset the event to the earliest offset when the consumer group
+// is created.
+func AutoOffsetResetEarliest() Option {
+	return func(o *optionsCollector) {
+		o.autoOffsetReset = autoOffsetResetEarliest
+	}
+}
+
+// AutoOffsetResetLatest sets the client to automatically reset the event to the latest offset when the consumer group
+// is created.
+func AutoOffsetResetLatest() Option {
+	return func(o *optionsCollector) {
+		o.autoOffsetReset = autoOffsetResetLateset
 	}
 }

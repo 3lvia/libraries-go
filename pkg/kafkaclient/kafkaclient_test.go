@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	confluentKey    = "XX"
-	confluentSecret = "XX"
+	confluentKey    = "XXX"
+	confluentSecret = "XXX"
 	boostrapServer  = "pkc-lq8gm.westeurope.azure.confluent.cloud:9092"
 )
 
@@ -38,20 +38,32 @@ func TestStartConsumer(t *testing.T) {
 	topic := "private.dp.edna.examples"
 	application := "democonsumer-1"
 
-	stream, closer, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v), WithAPIKey(confluentKey, confluentSecret))
+	stream, closer, err := StartConsumer(
+		ctx,
+		system,
+		topic,
+		application,
+		WithSecretsManager(v),
+		WithAPIKey(confluentKey, confluentSecret),
+		ReturnFakes(),
+		AutoOffsetResetEarliest(),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer closer()
 
 	wg := sync.WaitGroup{}
-	wg.Add(100)
+	wg.Add(10)
 
 	go func(ch <-chan *StreamingMessage, wg *sync.WaitGroup) {
-		msg := <-ch
-		x := msg
-		fmt.Printf("%s\n", x.String)
-		wg.Done()
+		for {
+			msg := <-ch
+			x := msg
+			fmt.Printf("%s (%s) fake: %v\n", x.String, x.Timestamp.Format("2006-01-02 15:04:05.000"), x.IsFake)
+
+			wg.Done()
+		}
 	}(stream, &wg)
 
 	wg.Wait()

@@ -39,23 +39,35 @@ func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opt
 
 	creator := creatorFunc(collector)
 
-	c := config(secrets)
+	c := config(secrets, collector, consumerGroup)
 
-	ch, closer, err := startConsumer(ctx, topic, consumerGroup, creator, registry, c)
+	ch, closer, err := startConsumer(ctx, topic, creator, registry, collector.returnFakes, c)
 	if err != nil {
 		return nil, nil, err
 	}
 	return ch, closer, nil
 }
 
-func config(secrets *secretConfigValues) kafka.ConfigMap {
+func config(secrets *secretConfigValues, collector *optionsCollector, consumerGroup string) kafka.ConfigMap {
+	var offsetReset string
+	switch collector.autoOffsetReset {
+	case autoOffsetResetEarliest:
+		offsetReset = "earliest"
+	case autoOffsetResetLateset:
+		offsetReset = "latest"
+	default:
+		offsetReset = "none"
+	}
+
 	return map[string]kafka.ConfigValue{
 		"security.protocol": "SASL_SSL",
 		"sasl.mechanisms":   "PLAIN",
 		"bootstrap.servers": secrets.bootstrapServer,
 		"sasl.username":     secrets.key,
 		"sasl.password":     secrets.secret,
-		"acks":              "all",
+		"auto.offset.reset": offsetReset,
+		"group.id":          consumerGroup,
+		//"acks":              "all",
 	}
 }
 

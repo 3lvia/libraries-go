@@ -29,6 +29,10 @@ type StreamingMessage struct {
 
 	// String is a string representation of the message on the format "TOPIC[PARTITION]@OFFSET"
 	String string
+
+	// IsFake is true if the message is a fake message, i.e. a message that comes from the topic, but that is marked as
+	// fake by the producer.
+	IsFake bool
 }
 
 // EntityCreatorFunc is a function that creates an entity from a byte array. It is the responsibility
