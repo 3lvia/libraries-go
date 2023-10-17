@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
@@ -39,7 +40,7 @@ func (f *kafkaMessageFetcher) PollFetches(ctx context.Context, format mschema.Ty
 		}
 	})
 
-	it := newIterator(fetches.RecordIter(), creator, f.registry)
+	it := newIterator(fetches.RecordIter(), creator, format, f.registry)
 
 	return it, nil
 }
