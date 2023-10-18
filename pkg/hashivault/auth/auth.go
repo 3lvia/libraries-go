@@ -45,14 +45,14 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 
 	switch method {
 	case MethodOICD:
-		return authOICD(spanCtx, addr)
+		return authOICD(spanCtx, addr, newCache())
 	case MethodGitHub:
 		if collector.gitHubToken == "" {
 			err := errors.New("no GitHub token provided")
 			traceError(span, err)
 			return nil, err
 		}
-		return authGitHub(spanCtx, addr, collector.gitHubToken, client)
+		return authGitHub(spanCtx, addr, collector.gitHubToken, client, newCache())
 	case MethodK8s:
 		if collector.k8sServicePath == "" || collector.k8sRole == "" {
 			err := errors.New("no k8s service path or role provided")

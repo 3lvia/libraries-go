@@ -54,6 +54,8 @@ go.work
 .idea/**/gradle.xml
 .idea/**/libraries
 
+.DS_Store
+
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
@@ -132,3 +134,4 @@ fabric.properties
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/go,goland+all,visualstudiocode
+pkg/hashivault/.idea/workspace.xml
