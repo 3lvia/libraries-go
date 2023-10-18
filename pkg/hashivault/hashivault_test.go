@@ -176,33 +176,6 @@ func NoErr(t *testing.T, err error) {
 	}
 }
 
-func TestTempFile(t *testing.T) {
-	f, err := os.CreateTemp("", "sample")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-	fmt.Println("Temp file name:", f.Name())
-	fmt.Println("Temp dir is: ", os.TempDir())
-}
-
-func TestReadDir(t *testing.T) {
-	dir, err := os.Open(os.TempDir())
-	if err != nil {
-		log.Fatalf("Failed opening directory: %s", err)
-	}
-	defer dir.Close()
-
-	files, err := dir.Readdir(-1) // -1 means to retrieve all files in the directory
-	if err != nil {
-		log.Fatalf("Failed reading directory: %s", err)
-	}
-
-	for _, file := range files {
-		fmt.Println(file.Name())
-	}
-}
-
 const (
 	ghVaultResponseTemplate = `{
     "request_id": "d645ddd7-3b2e-f28b-0138-512d5ff301a4",
