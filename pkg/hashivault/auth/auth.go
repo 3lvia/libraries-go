@@ -52,7 +52,7 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 			traceError(span, err)
 			return nil, err
 		}
-		return authGitHub(spanCtx, addr, collector.gitHubToken, client, newCache())
+		return authGitHub(spanCtx, addr, collector.gitHubToken, client)
 	case MethodK8s:
 		if collector.k8sServicePath == "" || collector.k8sRole == "" {
 			err := errors.New("no k8s service path or role provided")

@@ -12,16 +12,10 @@ import (
 	"net/http"
 )
 
-func authGitHub(ctx context.Context, vaultAddr, githubToken string, client *http.Client, cache localCache) (AuthenticationResponse, error) {
+func authGitHub(ctx context.Context, vaultAddr, githubToken string, client *http.Client) (AuthenticationResponse, error) {
 	tracer := otel.GetTracerProvider().Tracer(tracerName)
 	_, span := tracer.Start(ctx, "auth.authGitHub", trace.WithAttributes(attribute.String("vault_addr", vaultAddr)))
 	defer span.End()
-
-	cached, ok := cache.get()
-	if ok {
-		span.AddEvent("using cached token")
-		return cached, nil
-	}
 
 	path := "auth/github/login"
 	requestBody, err := githubLogin(githubToken)
@@ -52,12 +46,6 @@ func authGitHub(ctx context.Context, vaultAddr, githubToken string, client *http
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		return nil, fmt.Errorf("while unmarshalling response body: %w", err)
-	}
-
-	fn, err := cache.save(response)
-	span.SetAttributes(attribute.String("cache_file", fn))
-	if err != nil {
-		span.AddEvent("error saving token to cache", trace.WithAttributes(attribute.String("error", err.Error())))
 	}
 
 	return response, nil

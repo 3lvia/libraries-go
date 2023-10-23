@@ -35,6 +35,8 @@ go.work
 .idea/**/dictionaries
 .idea/**/shelf
 
+pkg/hashivault/.idea/*.*
+
 # AWS User-specific
 .idea/**/aws.xml
 
