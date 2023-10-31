@@ -4,6 +4,7 @@ import (
 	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"net/http"
+	"time"
 )
 
 type autoOffsetResetType int
@@ -23,6 +24,8 @@ type optionsCollector struct {
 	formatSet       bool
 	returnFakes     bool
 	autoOffsetReset autoOffsetResetType
+	offsetTime      time.Time
+	offsetTimeSet   bool
 }
 
 // Option is a function that can be used to configure this package.
@@ -112,5 +115,13 @@ func AutoOffsetResetEarliest() Option {
 func AutoOffsetResetLatest() Option {
 	return func(o *optionsCollector) {
 		o.autoOffsetReset = autoOffsetResetLateset
+	}
+}
+
+// WithOffsetTime sets the offset to start consuming from to match (as close as possible) match the given time.
+func WithOffsetTime(t time.Time) Option {
+	return func(o *optionsCollector) {
+		o.offsetTime = t
+		o.offsetTimeSet = true
 	}
 }

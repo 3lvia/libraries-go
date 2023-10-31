@@ -7,11 +7,12 @@ import (
 	"log"
 	"sync"
 	"testing"
+	"time"
 )
 
 const (
-	confluentKey    = "XXX"
-	confluentSecret = "XXX"
+	confluentKey    = "PVTYEHIRJ46T27H5"
+	confluentSecret = "TrLS8343q9M+9wOUEPGPL671JeJgtkROALGqZ22cZ4pawzAzffk05aNARyMEb8Of"
 	boostrapServer  = "pkc-lq8gm.westeurope.azure.confluent.cloud:9092"
 )
 
@@ -47,6 +48,7 @@ func TestStartConsumer(t *testing.T) {
 		WithAPIKey(confluentKey, confluentSecret),
 		ReturnFakes(),
 		AutoOffsetResetEarliest(),
+		WithOffsetTime(time.Now().Add(-12*time.Hour)),
 	)
 	if err != nil {
 		log.Fatal(err)

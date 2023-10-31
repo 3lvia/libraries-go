@@ -3,7 +3,7 @@ module github.com/3lvia/libraries-go/pkg/kafkaclient
 go 1.21.0
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2
+	github.com/3lvia/libraries-go/pkg/hashivault v0.1.3
 	github.com/3lvia/libraries-go/pkg/mschema v0.0.2
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/linkedin/goavro/v2 v2.11.1

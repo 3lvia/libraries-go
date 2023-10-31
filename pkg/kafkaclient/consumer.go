@@ -14,13 +14,14 @@ func startConsumer(
 	creator EntityCreatorFunc,
 	registry mschema.Registry,
 	returnFakes bool,
-	c kafka.ConfigMap) (<-chan *StreamingMessage, func() error, error) {
-	kafkaConsumer, err := kafka.NewConsumer(&c)
-	if err != nil {
-		return nil, nil, err
-	}
+	kafkaConsumer *kafka.Consumer,
+	offsets []kafka.TopicPartition) (<-chan *StreamingMessage, func() error, error) {
 
-	if err = kafkaConsumer.SubscribeTopics([]string{topic}, nil); err != nil {
+	if offsets != nil && len(offsets) > 0 {
+		if err := kafkaConsumer.Assign(offsets); err != nil {
+			return nil, nil, err
+		}
+	} else if err := kafkaConsumer.SubscribeTopics([]string{topic}, nil); err != nil {
 		return nil, nil, err
 	}
 

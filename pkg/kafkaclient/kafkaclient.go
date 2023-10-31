@@ -7,6 +7,7 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/linkedin/goavro/v2"
 	"net/http"
+	"time"
 )
 
 func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opts ...Option) (<-chan *StreamingMessage, func() error, error) {
@@ -41,11 +42,80 @@ func StartConsumer(ctx context.Context, system, topic, consumerGroup string, opt
 
 	c := config(secrets, collector, consumerGroup)
 
-	ch, closer, err := startConsumer(ctx, topic, creator, registry, collector.returnFakes, c)
+	kafkaConsumer, err := kafka.NewConsumer(&c)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	offsets, err := getTimeOffsets(topic, kafkaConsumer, collector)
+
+	ch, closer, err := startConsumer(ctx, topic, creator, registry, collector.returnFakes, kafkaConsumer, offsets)
 	if err != nil {
 		return nil, nil, err
 	}
 	return ch, closer, nil
+}
+
+func getTimeOffsets(topic string, c *kafka.Consumer, collector *optionsCollector) ([]kafka.TopicPartition, error) {
+	if !collector.offsetTimeSet {
+
+		return nil, nil
+	}
+
+	timestamp := collector.offsetTime.UnixNano() / int64(time.Millisecond)
+	times := []kafka.TopicPartition{{Topic: &topic, Offset: kafka.Offset(timestamp)}}
+	partitionOffsets, err := c.OffsetsForTimes(times, 5000)
+	if err != nil {
+		return nil, err
+	}
+
+	return partitionOffsets, nil
+}
+
+func kafkaConsumer(secrets *secretConfigValues, collector *optionsCollector, topic, consumerGroup string) (*kafka.Consumer, []kafka.TopicPartition, error) {
+	c := config(secrets, collector, consumerGroup)
+
+	kc, err := kafka.NewConsumer(&c)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var offsets []kafka.TopicPartition
+	if collector.offsetTimeSet {
+		timestamp := collector.offsetTime.UnixNano() / int64(time.Millisecond)
+		times := []kafka.TopicPartition{{Topic: &topic, Offset: kafka.Offset(timestamp)}}
+		partitionOffsets, err := kc.OffsetsForTimes(times, 5000)
+		if err != nil {
+			return nil, nil, err
+		}
+		offsets = partitionOffsets
+	} else {
+		adminClient, err := kafka.NewAdminClientFromConsumer(kc)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		metadata, err := adminClient.GetMetadata(&topic, false, 5000)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		for i := 0; i < len(metadata.Topics[topic].Partitions); i++ {
+			tp := kafka.TopicPartition{
+				Topic:     &topic,
+				Partition: i,
+				Offset:    kafka.OffsetEnd,
+			}
+			offsets = append(offsets, tp)
+		}
+	}
+
+	//offsets, err := getTimeOffsets(secrets.topic, kafkaConsumer, collector)
+	//if err != nil {
+	//	return nil, nil, err
+	//}
+
+	return kc, offsets, nil
 }
 
 func config(secrets *secretConfigValues, collector *optionsCollector, consumerGroup string) kafka.ConfigMap {

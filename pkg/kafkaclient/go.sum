@@ -2,6 +2,8 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/3lvia/libraries-go/pkg/hashivault v0.1.2 h1:9k4NUeoj1NjczrB9b86Opo2XNw5zD13kDuV4GGu6Cn8=
 github.com/3lvia/libraries-go/pkg/hashivault v0.1.2/go.mod h1:YH1kKbcrQ3T5Ii20fb9km0zmBhK8EdjeWyFXvkVB39I=
+github.com/3lvia/libraries-go/pkg/hashivault v0.1.3 h1:sMsO4jPUgV3eJMflmLWAt3N0DgFRaK7vP3/doLUR2K4=
+github.com/3lvia/libraries-go/pkg/hashivault v0.1.3/go.mod h1:YH1kKbcrQ3T5Ii20fb9km0zmBhK8EdjeWyFXvkVB39I=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.2 h1:h9xbOXi3TW8mEE976GvJzqj+Q6YkJE4UfJ46OnQjRuw=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.2/go.mod h1:YgMteAQJ8GLnlaDPSsNMvczS6X1DBphbqG/Hlkfjhok=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
