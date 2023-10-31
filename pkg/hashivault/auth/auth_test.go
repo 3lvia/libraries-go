@@ -31,6 +31,7 @@ func TestAuthenticate_github(t *testing.T) {
 }
 
 func TestAuthenticate_k8s(t *testing.T) {
+	t.Skip("skipping test, requires k8s")
 	ctx := context.Background()
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, ghVaultResponse)

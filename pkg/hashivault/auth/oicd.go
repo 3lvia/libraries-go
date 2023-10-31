@@ -69,10 +69,16 @@ func (r oicdResponse) After() <-chan time.Time {
 	return time.After(time.Duration(r.s.Auth.LeaseDuration) * time.Second)
 }
 
-func authOICD(ctx context.Context, addr string) (AuthenticationResponse, error) {
+func authOICD(ctx context.Context, addr string, cache localCache) (AuthenticationResponse, error) {
 	tracer := otel.GetTracerProvider().Tracer(tracerName)
 	_, span := tracer.Start(ctx, "auth.authOICD", trace.WithAttributes(attribute.String("vault_addr", addr)))
 	defer span.End()
+
+	cached, ok := cache.get()
+	if ok {
+		span.AddEvent("using cached token")
+		return cached, nil
+	}
 
 	doneCh := make(chan loginResp)
 	var resp loginResp
@@ -119,6 +125,13 @@ func authOICD(ctx context.Context, addr string) (AuthenticationResponse, error) 
 	}
 
 	finalResp := oicdResponse{s: resp.secret}
+
+	fn, err := cache.save(finalResp)
+	span.SetAttributes(attribute.String("cache_file", fn))
+	if err != nil {
+		span.AddEvent("error saving token to cache", trace.WithAttributes(attribute.String("error", err.Error())))
+	}
+
 	return finalResp, nil
 }
 

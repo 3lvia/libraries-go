@@ -7,7 +7,7 @@ type Method int
 
 const (
 	_ Method = iota // skip 0
-	// MethodGitHub is the authentication method where GitHub tokens are used to autenticate the user.
+	// MethodGitHub is the authentication method where GitHub tokens are used to authenticate the user.
 	MethodGitHub Method = iota
 
 	// MethodK8s is the authentication method where Kubernetes service accounts are used to authenticate the user.

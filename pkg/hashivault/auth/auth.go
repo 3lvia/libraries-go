@@ -1,3 +1,13 @@
+// Package auth provides functionality for authenticating against Vault. The package supports the following
+// authentication methods:
+//  1. GitHub tokens. This method is used for authenticating people. It is deprecated and will be removed in a future
+//     version. Use OICD or Vault tokens instead.
+//  2. Kubernetes service accounts (option: WithK8s). This method is used for authenticating pods.
+//  3. OpenID Connect tokens. This method is used for authenticating people. When using this method, a local file cache
+//     is used to cache the authentication token. This is done to spare the developer from having to endure the login
+//     process every time the application is restarted. If the developer for some reason wishes to disable this cache,
+//     this can be done by setting the DisableLocalCache option to true.
+//  4. Vault tokens. This method is used for authenticating people.
 package auth
 
 import (
@@ -17,6 +27,7 @@ const defaultTracerName = "go.opentelemetry.io/otel"
 
 var tracerName string
 
+// Authenticate authenticates against the Vault instance using the authentication method given in the options.
 func Authenticate(ctx context.Context, addr string, method Method, opts ...Option) (AuthenticationResponse, error) {
 	collector := &optionsCollector{}
 	for _, opt := range opts {
@@ -45,7 +56,7 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 
 	switch method {
 	case MethodOICD:
-		return authOICD(spanCtx, addr)
+		return authOICD(spanCtx, addr, newCache(collector.disableLocalCache))
 	case MethodGitHub:
 		if collector.gitHubToken == "" {
 			err := errors.New("no GitHub token provided")
