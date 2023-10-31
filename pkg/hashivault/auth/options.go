@@ -15,9 +15,11 @@ type optionsCollector struct {
 
 	l              *log.Logger
 	otelTracerName string
+
+	disableLocalCache bool
 }
 
-// Option expl
+// Option is a function that can be used to configure this package.
 type Option func(*optionsCollector)
 
 // WithClient sets the http client to use for requests
@@ -28,6 +30,7 @@ func WithClient(client *http.Client) Option {
 }
 
 // WithGitHubToken sets the GitHub token to use for authentication
+// Deprecated: Use WithToken or WithOICD instead
 func WithGitHubToken(token string) Option {
 	return func(o *optionsCollector) {
 		o.gitHubToken = token
@@ -42,14 +45,25 @@ func WithK8s(servicePath, role string) Option {
 	}
 }
 
+// WithLogger sets the logger to use for logging.
 func WithLogger(l *log.Logger) Option {
 	return func(o *optionsCollector) {
 		o.l = l
 	}
 }
 
+// WithOtelTracerName sets the name of the OpenTelemetry tracer to use when creating spans. If no name is set the
+// tracer name "go.opentelemetry.io/otel" is used.
 func WithOtelTracerName(name string) Option {
 	return func(o *optionsCollector) {
 		o.otelTracerName = name
+	}
+}
+
+// DisableLocalCache disables the local cache of secrets. Is only applicable when using the OICD authentication method
+// on the local development machine.
+func DisableLocalCache() Option {
+	return func(o *optionsCollector) {
+		o.disableLocalCache = true
 	}
 }

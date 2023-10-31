@@ -12,7 +12,7 @@ func Test_localCacheImpl_get_noCachedFile(t *testing.T) {
 	fs := &mockFileSystem{e: false}
 	currentCacheFileSystem = fs
 
-	cache := newCache()
+	cache := newCache(false)
 	_, ok := cache.get()
 	if ok {
 		t.Error("expected no cached file")
@@ -32,7 +32,7 @@ func Test_localCacheImpl_get_cachedFile(t *testing.T) {
 	fs := &mockFileSystem{e: true, cached: cachedResponse}
 	currentCacheFileSystem = fs
 
-	cache := newCache()
+	cache := newCache(false)
 	response, ok := cache.get()
 	if !ok {
 		t.Error("expected ok")
@@ -56,7 +56,7 @@ func Test_localCacheImpl_get_staleCachedFile(t *testing.T) {
 	fs := &mockFileSystem{e: true, cached: cachedResponse}
 	currentCacheFileSystem = fs
 
-	cache := newCache()
+	cache := newCache(false)
 	_, ok := cache.get()
 	if ok {
 		t.Error("expected not ok")
@@ -67,7 +67,7 @@ func Test_localCacheImpl_get_save(t *testing.T) {
 	fs := &mockFileSystem{}
 	currentCacheFileSystem = fs
 
-	cache := newCache()
+	cache := newCache(false)
 
 	response := cachedAuthenticationResponse{
 		ValidUntil: time.Now().UTC().Add(time.Hour * -1),
@@ -86,6 +86,22 @@ func Test_localCacheImpl_get_save(t *testing.T) {
 
 	if fs.stored.Token != response.Token {
 		t.Errorf("unexpected token, got %s", fs.stored.Token)
+	}
+}
+
+func Test_noopCache(t *testing.T) {
+	cache := newCache(true)
+	_, ok := cache.get()
+	if ok {
+		t.Error("expected no cached file")
+	}
+
+	fn, err := cache.save(cachedAuthenticationResponse{})
+	if err != nil {
+		t.Errorf("unexpected error, got %s", err)
+	}
+	if fn != "noop_no_file" {
+		t.Errorf("unexpected file name, got %s", fn)
 	}
 }
 

@@ -13,7 +13,10 @@ const (
 
 var currentCacheFileSystem cacheFileSystem
 
-func newCache() localCache {
+func newCache(disabled bool) localCache {
+	if disabled {
+		return &noopCache{}
+	}
 	return &localCacheImpl{}
 }
 
@@ -25,7 +28,7 @@ type localCache interface {
 type localCacheImpl struct {
 }
 
-func (l localCacheImpl) get() (AuthenticationResponse, bool) {
+func (l *localCacheImpl) get() (AuthenticationResponse, bool) {
 	fs := currentCacheFileSystem
 	if fs == nil {
 		fs = cacheFileSystemImpl{}
@@ -33,7 +36,7 @@ func (l localCacheImpl) get() (AuthenticationResponse, bool) {
 	return l.getCore(fs)
 }
 
-func (l localCacheImpl) getCore(fs cacheFileSystem) (AuthenticationResponse, bool) {
+func (l *localCacheImpl) getCore(fs cacheFileSystem) (AuthenticationResponse, bool) {
 	f := path.Join(os.TempDir(), tokenFileName)
 	if !fs.exists(f) {
 		return nil, false
@@ -56,7 +59,7 @@ func (l localCacheImpl) getCore(fs cacheFileSystem) (AuthenticationResponse, boo
 	return cr, true
 }
 
-func (l localCacheImpl) save(response AuthenticationResponse) (string, error) {
+func (l *localCacheImpl) save(response AuthenticationResponse) (string, error) {
 	fs := currentCacheFileSystem
 	if fs == nil {
 		fs = cacheFileSystemImpl{}
@@ -64,7 +67,7 @@ func (l localCacheImpl) save(response AuthenticationResponse) (string, error) {
 	return l.saveCore(response, fs)
 }
 
-func (l localCacheImpl) saveCore(response AuthenticationResponse, fs cacheFileSystem) (string, error) {
+func (l *localCacheImpl) saveCore(response AuthenticationResponse, fs cacheFileSystem) (string, error) {
 	validUntil := time.Now().UTC().Add(time.Duration(response.LeaseDurationSeconds()) * time.Second)
 	cr := cachedAuthenticationResponse{
 		ValidUntil:    validUntil,
@@ -85,6 +88,16 @@ func (l localCacheImpl) saveCore(response AuthenticationResponse, fs cacheFileSy
 	}
 
 	return p, nil
+}
+
+type noopCache struct{}
+
+func (n *noopCache) get() (AuthenticationResponse, bool) {
+	return nil, false
+}
+
+func (n *noopCache) save(response AuthenticationResponse) (string, error) {
+	return "noop_no_file", nil
 }
 
 type cachedAuthenticationResponse struct {
