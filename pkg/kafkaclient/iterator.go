@@ -18,6 +18,7 @@ func newIterator(iter *kgo.FetchesRecordIter, creator EntityCreatorFunc, format 
 	return &messageIterator{
 		iter:     iter,
 		creator:  creator,
+		format: format,
 		registry: registry,
 	}
 }
