@@ -1,6 +1,6 @@
 module github.com/3lvia/libraries-go/pkg/kafkaclient
 
-go 1.21.0
+go 1.22.0
 
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.1.2
