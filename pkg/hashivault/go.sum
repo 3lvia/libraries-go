@@ -17,6 +17,8 @@ github.com/go-logr/stdr v1.2.2/go.mod h1:mMo/vtBO5dYbehREoey6XUKy/eSumjCCveDpRre
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/hashicorp/cap v0.3.4 h1:RoqWYqr6LaDLuvnBCpod1sZtvuEhehIhu0GncmoHW40=
 github.com/hashicorp/cap v0.3.4/go.mod h1:dHTmyMIVbzT981XxRoci5G//dfWmd/HhuNiCH6J5+IA=
+github.com/hashicorp/cap v0.5.0 h1:YIlAYxdXXtx2IL1JDvP2OyEl55Ooi0yl573kSB9Orlw=
+github.com/hashicorp/cap v0.5.0/go.mod h1:IAy00Er+ZFpMo+5x6B4bkO2HgpzgrkfsuDWMmHAuKUE=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/errwrap v1.1.0 h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY2I=
 github.com/hashicorp/errwrap v1.1.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
