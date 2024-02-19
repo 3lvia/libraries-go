@@ -6,6 +6,8 @@ github.com/3lvia/libraries-go/pkg/hashivault v0.1.5 h1:BNgxiXoMgncNBJTng/TPyr4v3
 github.com/3lvia/libraries-go/pkg/hashivault v0.1.5/go.mod h1:7X8UMmlLyIBCINxuEUtjFaMQ6MiPyAXakkHR2tX0u6U=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.2 h1:h9xbOXi3TW8mEE976GvJzqj+Q6YkJE4UfJ46OnQjRuw=
 github.com/3lvia/libraries-go/pkg/mschema v0.0.2/go.mod h1:YgMteAQJ8GLnlaDPSsNMvczS6X1DBphbqG/Hlkfjhok=
+github.com/3lvia/libraries-go/pkg/mschema v0.0.3 h1:I71zgmlTrYV5hfgs10CVOGBfG3U4uSkGVSKwR7Nj6sY=
+github.com/3lvia/libraries-go/pkg/mschema v0.0.3/go.mod h1:C5qdQouA9/k0VFZVlSryRjS6SW0RSn9xXYbv0VKA/pM=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/cenkalti/backoff/v3 v3.0.0 h1:ske+9nBpD9qZsTBoF41nW5L+AIuFBKMeze18XQ3eG1c=
