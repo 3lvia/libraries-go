@@ -1,6 +1,6 @@
 module github.com/3lvia/libraries-go/pkg/mschema
 
-go 1.22.0
+go 1.22.1
 
 require (
 	go.opentelemetry.io/otel v1.23.1
