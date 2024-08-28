@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.1.5
 	github.com/3lvia/libraries-go/pkg/mschema v0.0.3
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 )
 
 require (
