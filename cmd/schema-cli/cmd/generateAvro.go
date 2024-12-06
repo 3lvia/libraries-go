@@ -138,7 +138,12 @@ func storeSchema(d mschema.Descriptor) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(f)
 	if _, err := f.WriteString(d.Schema()); err != nil {
 		return "", err
 	}

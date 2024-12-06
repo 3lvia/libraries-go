@@ -48,7 +48,7 @@ func startTestServer(t *testing.T) (string, *http.Client, closerFunc) {
 		loginCount++
 		w.WriteHeader(http.StatusOK)
 		tokenResponse := fmt.Sprintf(ghVaultResponseTemplate, fmt.Sprintf("token-%d", loginCount))
-		fmt.Fprintln(w, tokenResponse)
+		_, _ = fmt.Fprintln(w, tokenResponse)
 	}
 	handlers["/v1/auth/github/login"] = loginHandler
 

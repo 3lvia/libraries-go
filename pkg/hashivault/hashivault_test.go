@@ -55,7 +55,7 @@ func TestNew_static(t *testing.T) {
 
 	addHandler("/v1/kunde/kv/data/appinsights/kunde", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, jsonStaticSecret)
+		_, _ = fmt.Fprintln(w, jsonStaticSecret)
 	})
 
 	gitHubToken := "my-github-token"
@@ -133,7 +133,7 @@ func TestNew_dynamic(t *testing.T) {
 		secretCount++
 		js := fmt.Sprintf(jsonDynamicSecret, fmt.Sprintf("secret-%d", secretCount))
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, js)
+		_, _ = fmt.Fprintln(w, js)
 	})
 
 	gitHubToken := "my-github-token"

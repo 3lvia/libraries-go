@@ -92,7 +92,7 @@ func Test_optionsCollector_validate_FromEnvVars(t *testing.T) {
 	}
 
 	c := &optionsCollector{}
-	//opt(c)
+	// opt(c)
 
 	if err := c.build(); err != nil {
 		t.Fatal(err)

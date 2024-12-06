@@ -41,6 +41,9 @@ func TestStartConsumer(t *testing.T) {
 	application := "democonsumer-2"
 
 	stream, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	msg := <-stream
 	_ = msg

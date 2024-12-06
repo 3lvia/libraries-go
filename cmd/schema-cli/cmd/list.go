@@ -36,6 +36,9 @@ func init() {
 
 func runList(ctx context.Context) {
 	registry, errChan, err := getRegistry(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	go func(ch <-chan error) {
 		for {

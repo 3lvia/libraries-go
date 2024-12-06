@@ -16,11 +16,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"net/http"
-	"os"
 )
 
 const defaultTracerName = "go.opentelemetry.io/otel"
@@ -78,11 +79,11 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 			l.Printf("successfully authenticated to k8s, got client token of length %d", len(r.ClientToken()))
 		}
 		return r, err
+	default:
+		err := fmt.Errorf("unknown authentication method: %s", methodToString(method))
+		traceError(span, err)
+		return nil, err
 	}
-
-	err := fmt.Errorf("unknown authentication method: %s", methodToString(method))
-	traceError(span, err)
-	return nil, err
 }
 
 // authReq returns a http request for authenticating to Vault
@@ -116,7 +117,7 @@ func loginBuffer(lt interface{}) (*bytes.Buffer, error) {
 func getJWT(k8ServicePath string) (string, error) {
 	b, err := os.ReadFile(k8ServicePath)
 	if err == nil {
-		//return "", fmt.Errorf("failed to read jwt token from %s: %w", k8ServicePath, err)
+		// return "", fmt.Errorf("failed to read jwt token from %s: %w", k8ServicePath, err)
 		return string(bytes.TrimSpace(b)), nil
 	}
 

@@ -29,14 +29,6 @@ func WithClient(client *http.Client) Option {
 	}
 }
 
-// WithGitHubToken sets the GitHub token to use for authentication
-// Deprecated: Use WithToken or WithOICD instead
-func WithGitHubToken(token string) Option {
-	return func(o *optionsCollector) {
-		o.gitHubToken = token
-	}
-}
-
 // WithK8s sets the Kubernetes service path and role to use for authentication
 func WithK8s(servicePath, role string) Option {
 	return func(o *optionsCollector) {

@@ -3,12 +3,6 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/cap/util"
-	"github.com/hashicorp/go-secure-stdlib/base62"
-	"github.com/hashicorp/vault/api"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"net"
 	"net/http"
 	"os"
@@ -18,6 +12,13 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/hashicorp/cap/util"
+	"github.com/hashicorp/go-secure-stdlib/base62"
+	"github.com/hashicorp/vault/api"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -267,7 +268,7 @@ func fetchAuthURL(c *api.Client, role, mount, callbackPort string, callbackMetho
 	}
 
 	if authURL == "" {
-		return "", "", fmt.Errorf("Unable to authorize role %q with redirect_uri %q. Check Vault logs for more information.", role, redirectURI)
+		return "", "", fmt.Errorf("unable to authorize role %q with redirect_uri %q. Check Vault logs for more information", role, redirectURI)
 	}
 
 	return authURL, clientNonce, nil

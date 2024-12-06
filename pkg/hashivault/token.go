@@ -105,7 +105,6 @@ func (j *tokenJob) authenticate(ctx context.Context) (auth.AuthenticationRespons
 		j.method,
 		auth.WithClient(j.client),
 		auth.WithLogger(j.l),
-		auth.WithGitHubToken(j.gitHubToken),
 		auth.WithK8s(j.k8sMountPath, j.k8sRole),
 		auth.WithOtelTracerName(tracerName))
 }
