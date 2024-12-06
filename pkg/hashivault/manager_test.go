@@ -17,13 +17,11 @@ func Test_manager_SetDefaultGoogleCredentials(t *testing.T) {
 		path string
 		key  string
 	}
-	tests := []struct {
+	var tests []struct {
 		name    string
 		fields  fields
 		args    args
 		wantErr bool
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

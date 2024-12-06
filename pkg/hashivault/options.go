@@ -2,10 +2,11 @@ package hashivault
 
 import (
 	"fmt"
-	"github.com/3lvia/libraries-go/pkg/hashivault/auth"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/3lvia/libraries-go/pkg/hashivault/auth"
 )
 
 type optionsCollector struct {

@@ -1,8 +1,9 @@
 package hashivault
 
 import (
-	"go.opentelemetry.io/otel/trace"
 	"log"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 const defaultTracerName = "go.opentelemetry.io/otel"

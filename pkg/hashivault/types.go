@@ -4,7 +4,7 @@ import "context"
 
 // SecretsManager represents a service that is able to provide clients with a secrets identified by paths.
 type SecretsManager interface {
-	// Get returns a function that returns a map of secrets. The point is that the returned function will always
+	// GetSecret returns a function that returns a map of secrets. The point is that the returned function will always
 	// return the latest version of the secret. Therefore, clients should save a reference to the function rather than
 	// saving the actual secrets, and invoke the func just-in-time as the secret is needed. The returned function is
 	// safe to use concurrently.

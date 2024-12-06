@@ -3,11 +3,12 @@ package hashivault
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"log"
 	"net/http"
 	"sync"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // New returns a new SecretsManager and also a channel that will send errors that may arise in the concurrent internal

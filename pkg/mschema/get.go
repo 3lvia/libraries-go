@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"io"
-	"net/http"
 )
 
 // GetById returns the schema descriptor for the given schema ID.
@@ -126,8 +127,8 @@ func get(ctx context.Context, topic, url, user, password string, client *http.Cl
 	return d, nil
 }
 
-//// List returns all the schemas that are registered in the schema registry.
-//func List() ([]Descriptor, error) {
+// // List returns all the schemas that are registered in the schema registry.
+// func List() ([]Descriptor, error) {
 //	url := fmt.Sprintf("%s/schemas?deleted=false&latestOnly=true", schemaRegistryURL)
 //	req, err := http.NewRequest("GET", url, nil)
 //	if err != nil {
@@ -158,4 +159,4 @@ func get(ctx context.Context, topic, url, user, password string, client *http.Cl
 //		res = append(res, d)
 //	}
 //	return res, nil
-//}
+// }

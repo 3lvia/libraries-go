@@ -2,11 +2,12 @@ package hashivault
 
 import (
 	"context"
-	"github.com/3lvia/libraries-go/pkg/hashivault/auth"
-	"go.opentelemetry.io/otel"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/3lvia/libraries-go/pkg/hashivault/auth"
+	"go.opentelemetry.io/otel"
 )
 
 type tokenGetterFunc func() string

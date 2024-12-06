@@ -2,10 +2,11 @@ package kafkaclient
 
 import (
 	"context"
-	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/3lvia/libraries-go/pkg/hashivault"
 )
 
 func Demo() {

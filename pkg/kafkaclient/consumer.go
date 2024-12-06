@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net"
+	"time"
+
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"github.com/twmb/franz-go/pkg/sasl/plain"
-	"net"
-	"time"
 )
 
 type consumer interface {
@@ -54,7 +55,7 @@ func newConsumer(
 
 		kgo.ConsumerGroup(consumerGroup),
 		kgo.ConsumeTopics(topic),
-		//kgo.ConsumeResetOffset(),
+		// kgo.ConsumeResetOffset(),
 		kgo.ClientID(clientID),
 	}
 

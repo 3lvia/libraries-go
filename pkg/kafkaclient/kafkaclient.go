@@ -3,8 +3,9 @@ package kafkaclient
 import (
 	"context"
 	"errors"
-	"github.com/3lvia/libraries-go/pkg/mschema"
 	"net/http"
+
+	"github.com/3lvia/libraries-go/pkg/mschema"
 )
 
 const defaultFormat = mschema.AVRO

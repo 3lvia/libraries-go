@@ -1,15 +1,13 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"context"
 	"fmt"
-	"github.com/3lvia/libraries-go/pkg/mschema"
 	"log"
 	"os"
 	"path"
+
+	"github.com/3lvia/libraries-go/pkg/mschema"
 
 	"github.com/spf13/cobra"
 )
@@ -120,18 +118,18 @@ func runGenerateAvro(ctx context.Context) {
 
 	//go:generate $GOPATH/bin/gogen-avro -package model model ./100112_1.avsc
 	//
-	//paths := pc.sortedPaths()
-	//for _, path := range paths {
+	// paths := pc.sortedPaths()
+	// for _, path := range paths {
 	//	if path == "" {
 	//		continue
 	//	}
 	//	fmt.Fprintf(w, "//go:generate mkdir -p %s\n", path)
 	//	//go:generate mkdir -p ./dp
-	//}
-	//for _, d := range avroSchemas {
+	// }
+	// for _, d := range avroSchemas {
 	//	subjPath := subjectToPath(d.Subject())
 	//	fmt.Fprintf(w, "//go:generate $GOPATH/bin/gogen-avro -containers %s ./avsc/%d_%d.avsc\n", subjPath, d.ID(), d.Version())
-	//}
+	// }
 }
 
 func storeSchema(d mschema.Descriptor) (string, error) {

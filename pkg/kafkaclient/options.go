@@ -1,9 +1,10 @@
 package kafkaclient
 
 import (
+	"net/http"
+
 	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"github.com/3lvia/libraries-go/pkg/mschema"
-	"net/http"
 )
 
 type optionsCollector struct {

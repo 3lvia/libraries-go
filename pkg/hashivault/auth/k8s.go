@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"io"
-	"net/http"
 )
 
 func authK8s(ctx context.Context, vaultAddr, k8ServicePath, role string, client *http.Client) (AuthenticationResponse, error) {

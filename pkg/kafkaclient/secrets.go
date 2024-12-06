@@ -3,6 +3,7 @@ package kafkaclient
 import (
 	"context"
 	"fmt"
+
 	"github.com/3lvia/libraries-go/pkg/hashivault"
 )
 
