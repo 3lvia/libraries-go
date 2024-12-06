@@ -12,6 +12,9 @@ import (
 	"github.com/twmb/franz-go/pkg/sasl/plain"
 )
 
+type ConsumerConfig struct {
+}
+
 type consumer interface {
 	start(ctx context.Context, output chan<- *StreamingMessage)
 }

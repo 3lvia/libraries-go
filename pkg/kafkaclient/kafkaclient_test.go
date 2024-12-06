@@ -9,10 +9,6 @@ import (
 	"github.com/3lvia/libraries-go/pkg/hashivault"
 )
 
-func Demo() {
-
-}
-
 func TestStartConsumer(t *testing.T) {
 	ctx := context.Background()
 
@@ -40,7 +36,11 @@ func TestStartConsumer(t *testing.T) {
 	topic := "private.dp.edna.examples"
 	application := "democonsumer-2"
 
-	stream, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v))
+	opts := []Option{
+		WithSecretsResolver(K8sSecrets{secrets: v}),
+	}
+
+	stream, err := StartConsumer(ctx, system, topic, application, opts...)
 	if err != nil {
 		log.Fatal(err)
 	}

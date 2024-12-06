@@ -12,20 +12,28 @@ const (
 	secretPathPatternRegistry = "edna/kv/data/cloudevents/creds/%s"
 )
 
-func getSecrets(ctx context.Context, system string, secrets hashivault.SecretsManager) (*secretConfigValues, error) {
-	secret, err := secrets.GetSecret(ctx, fmt.Sprintf(secretPathPatternRegistry, system))
+type SecretsResolver interface {
+	Get(ctx context.Context, system string) (*SecretConfigValues, error)
+}
+
+type K8sSecrets struct {
+	secrets hashivault.SecretsManager
+}
+
+func (k K8sSecrets) Get(ctx context.Context, system string) (*SecretConfigValues, error) {
+	secret, err := k.secrets.GetSecret(ctx, fmt.Sprintf(secretPathPatternRegistry, system))
 	if err != nil {
 		return nil, err
 	}
 	m := secret()
 
-	infoSecret, err := secrets.GetSecret(ctx, secretSchemaRegistryURL)
+	infoSecret, err := k.secrets.GetSecret(ctx, secretSchemaRegistryURL)
 	if err != nil {
 		return nil, err
 	}
 	mInfo := infoSecret()
 
-	cv := &secretConfigValues{
+	cv := &SecretConfigValues{
 		registryURL:    mInfo["schema-registry-url"].(string),
 		registryKey:    m["schema_registry_key"].(string),
 		registrySecret: m["schema_registry_secret"].(string),
@@ -55,7 +63,7 @@ func getSecrets(ctx context.Context, system string, secrets hashivault.SecretsMa
 	return cv, nil
 }
 
-type secretConfigValues struct {
+type SecretConfigValues struct {
 	registryURL, registryKey, registrySecret string
 
 	key, secret string
