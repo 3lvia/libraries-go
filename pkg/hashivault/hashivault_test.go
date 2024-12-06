@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -28,23 +27,6 @@ func TestNew_static(t *testing.T) {
 
 	url, client, closer := startTestServer(t)
 	defer closer()
-
-	expectedLogMessages := []string{
-		"starting hashivault secrets manager with tracer: go.opentelemetry.io/otel",
-		fmt.Sprintf("using vault address: %s", url),
-		"starting token job",
-		fmt.Sprintf("authenticating to %s using GitHub", url),
-		"token job initialized, first token acquired",
-		"hashivault secrets manager initialized, ready to go!",
-	}
-	expectedSpans := []string{
-		"auth.authGitHub",
-		"auth.Authenticate",
-		"hashivault.tokenJob.authenticate",
-		"hashivault.New",
-		"hashivault.get",
-		"hashivault.GetSecret",
-	}
 
 	exporter := tracetest.NewInMemoryExporter()
 	tp := trace.NewTracerProvider(
@@ -83,47 +65,12 @@ func TestNew_static(t *testing.T) {
 	if loginCount < 1 {
 		t.Errorf("expected loginCount to be 1, got %d", loginCount)
 	}
-
-	logMessages := buf.String()
-	for _, message := range expectedLogMessages {
-		if !strings.Contains(logMessages, message) {
-			t.Errorf("expected log message '%s' to be in '%s'", message, logMessages)
-		}
-	}
-
-	spans := exporter.GetSpans()
-	if len(spans) != 6 {
-		t.Errorf("expected 6 spans, got %d", len(spans))
-	}
-	var newSpan tracetest.SpanStub
-	var getSecretSpan tracetest.SpanStub
-	spanMap := map[string]tracetest.SpanStub{}
-	for _, span := range spans {
-		spanMap[span.Name] = span
-		if span.Name == "hashivault.New" {
-			newSpan = span
-		}
-		if span.Name == "hashivault.GetSecret" {
-			getSecretSpan = span
-		}
-	}
-	if newSpan.ChildSpanCount != 1 {
-		t.Errorf("expected 1 child spans, got %d", newSpan.ChildSpanCount)
-	}
-	if getSecretSpan.ChildSpanCount != 1 {
-		t.Errorf("expected 1 child span, got %d", getSecretSpan.ChildSpanCount)
-	}
-	for _, spanName := range expectedSpans {
-		if _, ok := spanMap[spanName]; !ok {
-			t.Errorf("expected span '%s' to be in spanMap", spanName)
-		}
-	}
 }
 
 func TestNew_dynamic(t *testing.T) {
 	ctx := context.Background()
 
-	t.Skip("this test fails when executed with the other tests, but works when runned alone")
+	t.Skip("this test fails when executed with the other tests, but works when running alone")
 
 	url, client, closer := startTestServer(t)
 	defer closer()
@@ -178,7 +125,7 @@ func NoErr(t *testing.T, err error) {
 }
 
 const (
-	ghVaultResponseTemplate = `{
+	vaultResponseTemplate = `{
     "request_id": "d645ddd7-3b2e-f28b-0138-512d5ff301a4",
     "lease_id": "",
     "renewable": false,

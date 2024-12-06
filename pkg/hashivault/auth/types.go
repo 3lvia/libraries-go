@@ -7,14 +7,15 @@ type Method int
 
 const (
 	_ Method = iota // skip 0
+
 	// MethodGitHub is the authentication method where GitHub tokens are used to authenticate the user.
-	MethodGitHub Method = iota
+	MethodGitHub
 
 	// MethodK8s is the authentication method where Kubernetes service accounts are used to authenticate the user.
 	MethodK8s
 
-	// MethodOICD is the authentication method where OpenID Connect tokens are used to authenticate the user.
-	MethodOICD
+	// MethodOIDC is the authentication method where OpenID Connect tokens are used to authenticate the user.
+	MethodOIDC
 
 	// MethodToken is the authentication method where a Vault token has been obtained elsewhere and is used directly.
 	MethodToken
@@ -26,7 +27,7 @@ func methodToString(m Method) string {
 		return "GitHub"
 	case MethodK8s:
 		return "Kubernetes"
-	case MethodOICD:
+	case MethodOIDC:
 		return "OIDC"
 	case MethodToken:
 		return "Token"
@@ -35,7 +36,7 @@ func methodToString(m Method) string {
 	}
 }
 
-// gitToken holds github authentication information to be formatted to a bytes buffer
+// gitToken holds GitHub authentication information to be formatted to a bytes buffer
 type gitToken struct {
 	Token string `json:"token"`
 }

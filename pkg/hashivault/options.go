@@ -10,15 +10,16 @@ import (
 )
 
 type optionsCollector struct {
-	client         *http.Client
-	vaultAddress   string
-	gitHubToken    string
-	k8sMountPath   string
-	k8sRole        string
-	useOIDC        bool
-	vaultToken     string
-	otelTracerName string
-	logger         *log.Logger
+	client              *http.Client
+	vaultAddress        string
+	gitHubToken         string
+	k8sMountPath        string
+	k8sRole             string
+	useOIDC             bool
+	useOIDCDisableCache bool
+	vaultToken          string
+	otelTracerName      string
+	logger              *log.Logger
 }
 
 // Option is a function that can be used to configure this package.
@@ -31,10 +32,19 @@ func WithClient(client *http.Client) Option {
 	}
 }
 
+// WithGitHubToken sets the GitHub token to use when authenticating to Vault.
+// deprecated: use WithOIDC instead
+func WithGitHubToken(token string) Option {
+	return func(o *optionsCollector) {
+		o.gitHubToken = token
+	}
+}
+
 // WithOIDC sets the authentication method to OIDC.
-func WithOIDC() Option {
+func WithOIDC(disableCache bool) Option {
 	return func(o *optionsCollector) {
 		o.useOIDC = true
+		o.useOIDCDisableCache = disableCache
 	}
 }
 
@@ -49,13 +59,6 @@ func WithVaultToken(token string) Option {
 func WithVaultAddress(address string) Option {
 	return func(o *optionsCollector) {
 		o.vaultAddress = address
-	}
-}
-
-// WithGitHubToken sets the GitHub token to use when authenticating to Vault.
-func WithGitHubToken(token string) Option {
-	return func(o *optionsCollector) {
-		o.gitHubToken = token
 	}
 }
 
@@ -90,7 +93,7 @@ func (c *optionsCollector) authMethod() auth.Method {
 		return auth.MethodK8s
 	}
 	if c.useOIDC {
-		return auth.MethodOICD
+		return auth.MethodOIDC
 	}
 
 	return auth.MethodGitHub

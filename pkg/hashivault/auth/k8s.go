@@ -17,7 +17,7 @@ func authK8s(ctx context.Context, vaultAddr, k8ServicePath, role string, client 
 	tracer := otel.GetTracerProvider().Tracer(tracerName)
 	_, span := tracer.Start(
 		ctx,
-		"auth.authGitHub",
+		"auth.authK8s",
 		trace.WithAttributes(
 			attribute.String("vault_addr", vaultAddr),
 			attribute.String("k8s_service_path", k8ServicePath),

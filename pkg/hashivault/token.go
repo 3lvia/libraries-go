@@ -14,7 +14,6 @@ type tokenGetterFunc func() string
 
 func startTokenJob(ctx context.Context, c *optionsCollector, errChan chan<- error, initializedChan chan<- struct{}, client *http.Client, l *log.Logger) tokenGetterFunc {
 	if c.vaultToken != "" {
-		// If the token is already set, just return it
 		return func() string {
 			return c.vaultToken
 		}
@@ -26,8 +25,9 @@ func startTokenJob(ctx context.Context, c *optionsCollector, errChan chan<- erro
 		gitHubToken:  c.gitHubToken,
 		k8sMountPath: c.k8sMountPath,
 		k8sRole:      c.k8sRole,
-		client:       client,
 		method:       c.authMethod(),
+		disableCache: c.useOIDCDisableCache,
+		client:       client,
 		l:            l,
 	}
 
@@ -42,6 +42,7 @@ type tokenJob struct {
 	k8sMountPath string
 	k8sRole      string
 	currentToken string
+	disableCache bool
 	method       auth.Method
 	client       *http.Client
 	l            *log.Logger
@@ -99,12 +100,17 @@ func (j *tokenJob) authenticate(ctx context.Context) (auth.AuthenticationRespons
 	spanCtx, span := tracer.Start(ctx, "hashivault.tokenJob.authenticate")
 	defer span.End()
 
-	return auth.Authenticate(
-		spanCtx,
-		j.vaultAddress,
-		j.method,
+	opts := []auth.Option{
 		auth.WithClient(j.client),
 		auth.WithLogger(j.l),
+		auth.WithGitHubToken(j.gitHubToken),
 		auth.WithK8s(j.k8sMountPath, j.k8sRole),
-		auth.WithOtelTracerName(tracerName))
+		auth.WithOtelTracerName(tracerName),
+	}
+
+	if j.disableCache {
+		opts = append(opts, auth.DisableLocalCache())
+	}
+
+	return auth.Authenticate(spanCtx, j.vaultAddress, j.method, opts...)
 }

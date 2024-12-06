@@ -50,29 +50,29 @@ const (
 
 var errorRegex = regexp.MustCompile(`(?s)Errors:.*\* *(.*)`)
 
-type oicdResponse struct {
+type oidcResponse struct {
 	s *api.Secret
 }
 
-func (r oicdResponse) ClientToken() string {
+func (r oidcResponse) ClientToken() string {
 	return r.s.Auth.ClientToken
 }
 
-func (r oicdResponse) LeaseDurationSeconds() int {
+func (r oidcResponse) LeaseDurationSeconds() int {
 	return r.s.Auth.LeaseDuration
 }
 
-func (r oicdResponse) Renewable() bool {
+func (r oidcResponse) Renewable() bool {
 	return r.s.Auth.Renewable
 }
 
-func (r oicdResponse) After() <-chan time.Time {
+func (r oidcResponse) After() <-chan time.Time {
 	return time.After(time.Duration(r.s.Auth.LeaseDuration) * time.Second)
 }
 
-func authOICD(ctx context.Context, addr string, cache localCache) (AuthenticationResponse, error) {
+func authOIDC(ctx context.Context, addr string, cache localCache) (AuthenticationResponse, error) {
 	tracer := otel.GetTracerProvider().Tracer(tracerName)
-	_, span := tracer.Start(ctx, "auth.authOICD", trace.WithAttributes(attribute.String("vault_addr", addr)))
+	_, span := tracer.Start(ctx, "auth.authOIDC", trace.WithAttributes(attribute.String("vault_addr", addr)))
 	defer span.End()
 
 	cached, ok := cache.get()
@@ -101,7 +101,7 @@ func authOICD(ctx context.Context, addr string, cache localCache) (Authenticatio
 	}(errChan, defaultPort)
 
 	go func(ch chan<- loginResp, c *api.Client) {
-		h := &oicdHandler{doneCh: ch}
+		h := &oidcHandler{doneCh: ch}
 		v := map[string]string{}
 		h.Auth(c, v)
 	}(doneCh, client)
@@ -125,7 +125,7 @@ func authOICD(ctx context.Context, addr string, cache localCache) (Authenticatio
 		return nil, resp.err
 	}
 
-	finalResp := oicdResponse{s: resp.secret}
+	finalResp := oidcResponse{s: resp.secret}
 
 	fn, err := cache.save(finalResp)
 	span.SetAttributes(attribute.String("cache_file", fn))
@@ -136,7 +136,7 @@ func authOICD(ctx context.Context, addr string, cache localCache) (Authenticatio
 	return finalResp, nil
 }
 
-type oicdHandler struct {
+type oidcHandler struct {
 	doneCh chan<- loginResp
 }
 
@@ -147,7 +147,7 @@ type loginResp struct {
 	err    error
 }
 
-func (h *oicdHandler) Auth(c *api.Client, m map[string]string) {
+func (h *oidcHandler) Auth(c *api.Client, m map[string]string) {
 	mount, ok := m["mount"]
 	if !ok {
 		mount = defaultMount

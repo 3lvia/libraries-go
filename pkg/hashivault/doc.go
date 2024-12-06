@@ -5,7 +5,7 @@ AUTHENTICATION
 Four modes of authentication against Vault are supported (here listed according to precedence):
 1. Vault tokens (for people), usually in debugging situations where the other methods are not available
 2. Kubernetes authentication for pods
-3. Azure AD SSO authentication (OICD) for people
+3. Azure AD SSO authentication (OIDC) for people
 4. GitHub authentication for people
 
 The package can be configured via the options pattern, i.e. by sending a number of options to the New function.
@@ -35,7 +35,7 @@ The following options are supported:
     used.
 
 RECOMMENDED SETUP (ELVIA)
-In the context of developing and running services in Elvia, the recommended approach is to use OICD authentication
+In the context of developing and running services in Elvia, the recommended approach is to use OIDC authentication
 against Azure AD while developing, while Kubernetes authentication is used when running in the Kubernetes cluster.
 The latter is configured via environment variables, while the former is configured via the options pattern. Thus, the
 recommended approach is to use the following code in the main function:
@@ -47,7 +47,7 @@ v, errChan, err := hashivault.New(hashivault.WithOIDC(), hashivault.WithVaultAdd
 	}
 
 ```
-This ensures that the client will authenticate against Vault using OICD when running on the development machine,
+This ensures that the client will authenticate against Vault using OIDC when running on the development machine,
 while it will use Kubernetes authentication when running in the Kubernetes cluster (because the environment
 variables MOUNT_PATH and ROLE will be set).
 

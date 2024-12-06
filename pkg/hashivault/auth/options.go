@@ -29,6 +29,13 @@ func WithClient(client *http.Client) Option {
 	}
 }
 
+// WithGitHubToken sets the GitHub token to use for authentication
+func WithGitHubToken(token string) Option {
+	return func(o *optionsCollector) {
+		o.gitHubToken = token
+	}
+}
+
 // WithK8s sets the Kubernetes service path and role to use for authentication
 func WithK8s(servicePath, role string) Option {
 	return func(o *optionsCollector) {
@@ -52,7 +59,7 @@ func WithOtelTracerName(name string) Option {
 	}
 }
 
-// DisableLocalCache disables the local cache of secrets. Is only applicable when using the OICD authentication method
+// DisableLocalCache disables the local cache of secrets. Is only applicable when using the OIDC authentication method
 // on the local development machine.
 func DisableLocalCache() Option {
 	return func(o *optionsCollector) {

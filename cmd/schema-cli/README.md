@@ -19,6 +19,6 @@ Future features include:
 
 ## Authentication
 The CLI uses the Hashicorp Vault to authenticate with the Confluence Schema API. You can authenticate with the CLI
-either by letting it use the OICD flow to authenticate with Vault, or by providing a Vault token directly. Such a
+either by letting it use the OIDC flow to authenticate with Vault, or by providing a Vault token directly. Such a
 token can be obtained by running `vault login -method=oidc` and copying the token from the output. This token is used 
 with this cli either by passing it as the `--vaultToken` option, or by setting the `VAULT_TOKEN` environment variable.
