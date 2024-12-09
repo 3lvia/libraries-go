@@ -44,7 +44,9 @@ jobs:
           go-version-file: 'pkg/elvid/go.mod'
 
       - name: Run tests
-        run: 'go test -v ./...'
+        run: |
+            cd pkg/elvid
+            go test -v ./...
 
   test_hashivault:
     name: Test Hashivault
@@ -61,7 +63,9 @@ jobs:
           go-version-file: 'pkg/hashivault/go.mod'
 
       - name: Run tests
-        run: 'go test -v ./...'
+        run: |
+            cd pkg/hashivault
+            go test -v ./...
 
   test_kafkaclient:
     name: Test Kafka Client
@@ -78,7 +82,9 @@ jobs:
           go-version-file: 'pkg/kafkaclient/go.mod'
 
       - name: Run tests
-        run: 'go test -v ./...'
+        run: |
+            cd pkg/kafkaclient
+            go test -v ./...
 
   test_mschema:
     name: Test MSchema
@@ -95,7 +101,9 @@ jobs:
           go-version-file: 'pkg/mschema/go.mod'
 
       - name: Run tests
-        run: 'go test -v ./...'
+        run: |
+            cd pkg/mschema
+            go test -v ./...
 
 #  lint:
 #    name: Lint
