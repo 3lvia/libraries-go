@@ -1,0 +1,64 @@
+name: Analyze, test and lint
+
+on:
+  push:
+    branches: [trunk]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+  pull_request:
+    branches: [trunk]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: elvia-runner
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: 3lvia/core-github-actions-templates/analyze@trunk
+        with:
+          language: 'go'
+
+  test:
+    name: Test
+    runs-on: elvia-runner
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: 'go.sum'
+          go-version-file: 'go.mod'
+
+      - name: Run tests
+        run: 'go test -v ./...'
+
+#  lint:
+#    name: Lint
+#    runs-on: elvia-runner
+#    if: github.event_name == 'pull_request'
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#
+#      - name: Setup Go
+#        uses: actions/setup-go@v5
+#        with:
+#          cache-dependency-path: 'go.sum'
+#          go-version-file: 'go.mod'
+#
+#      - name: Run linter
+#        run: make lint
