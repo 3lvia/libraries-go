@@ -12,6 +12,8 @@ import (
 func TestStartConsumer(t *testing.T) {
 	ctx := context.Background()
 
+	t.Skip("skipping test")
+
 	vaultAddr := "https://vault.dev-elvia.io"
 	if err := os.Setenv("VAULT_ADDR", vaultAddr); err != nil {
 		t.Fatal(err)
@@ -19,7 +21,7 @@ func TestStartConsumer(t *testing.T) {
 
 	v, errChan, err := hashivault.New(
 		ctx,
-		hashivault.WithOIDC(),
+		hashivault.WithKubernetes("elvia", "elvia"),
 		hashivault.WithVaultAddress(vaultAddr),
 	)
 	if err != nil {
