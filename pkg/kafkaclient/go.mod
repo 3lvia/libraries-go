@@ -3,8 +3,8 @@ module github.com/3lvia/libraries-go/pkg/kafkaclient
 go 1.23
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.1.5
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.3
+	github.com/3lvia/libraries-go/pkg/hashivault v0.1.6
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.4
 	github.com/linkedin/goavro/v2 v2.13.0
 	github.com/twmb/franz-go v1.18.0
 )
@@ -28,7 +28,7 @@ require (
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/vault/api v1.15.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
