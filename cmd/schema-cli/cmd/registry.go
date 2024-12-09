@@ -3,10 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/3lvia/libraries-go/pkg/hashivault"
-	"github.com/3lvia/libraries-go/pkg/mschema"
 	"log"
 	"os"
+
+	"github.com/3lvia/libraries-go/pkg/hashivault"
+	"github.com/3lvia/libraries-go/pkg/mschema"
 )
 
 func getRegistry(ctx context.Context) (mschema.Registry, <-chan error, error) {

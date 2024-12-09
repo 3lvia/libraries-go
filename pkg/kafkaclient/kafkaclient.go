@@ -3,8 +3,9 @@ package kafkaclient
 import (
 	"context"
 	"errors"
-	"github.com/3lvia/libraries-go/pkg/mschema"
 	"net/http"
+
+	"github.com/3lvia/libraries-go/pkg/mschema"
 )
 
 const defaultFormat = mschema.AVRO
@@ -24,7 +25,7 @@ func StartConsumer(ctx context.Context, system, topic, application string, opts 
 		client = &http.Client{}
 	}
 
-	secrets, err := getSecrets(ctx, system, collector.secrets)
+	secrets, err := collector.secrets.Get(ctx, system)
 	if err != nil {
 		return nil, err
 	}

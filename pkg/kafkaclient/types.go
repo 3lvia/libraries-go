@@ -2,6 +2,7 @@ package kafkaclient
 
 import (
 	"context"
+
 	"github.com/3lvia/libraries-go/pkg/mschema"
 )
 

@@ -1,13 +1,11 @@
 // Package auth provides functionality for authenticating against Vault. The package supports the following
 // authentication methods:
-//  1. GitHub tokens. This method is used for authenticating people. It is deprecated and will be removed in a future
-//     version. Use OICD or Vault tokens instead.
-//  2. Kubernetes service accounts (option: WithK8s). This method is used for authenticating pods.
-//  3. OpenID Connect tokens. This method is used for authenticating people. When using this method, a local file cache
+//  1. Kubernetes service accounts (option: WithK8s). This method is used for authenticating pods.
+//  2. OpenID Connect tokens. This method is used for authenticating people. When using this method, a local file cache
 //     is used to cache the authentication token. This is done to spare the developer from having to endure the login
 //     process every time the application is restarted. If the developer for some reason wishes to disable this cache,
 //     this can be done by setting the DisableLocalCache option to true.
-//  4. Vault tokens. This method is used for authenticating people.
+//  3. Vault tokens. This method is used for authenticating people.
 package auth
 
 import (
@@ -16,11 +14,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"net/http"
-	"os"
 )
 
 const defaultTracerName = "go.opentelemetry.io/otel"
@@ -55,8 +54,6 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 	}
 
 	switch method {
-	case MethodOICD:
-		return authOICD(spanCtx, addr, newCache(collector.disableLocalCache))
 	case MethodGitHub:
 		if collector.gitHubToken == "" {
 			err := errors.New("no GitHub token provided")
@@ -64,6 +61,8 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 			return nil, err
 		}
 		return authGitHub(spanCtx, addr, collector.gitHubToken, client)
+	case MethodOIDC:
+		return authOIDC(spanCtx, addr, newCache(collector.disableLocalCache))
 	case MethodK8s:
 		if collector.k8sServicePath == "" || collector.k8sRole == "" {
 			err := errors.New("no k8s service path or role provided")
@@ -78,11 +77,11 @@ func Authenticate(ctx context.Context, addr string, method Method, opts ...Optio
 			l.Printf("successfully authenticated to k8s, got client token of length %d", len(r.ClientToken()))
 		}
 		return r, err
+	default:
+		err := fmt.Errorf("unknown authentication method: %s", methodToString(method))
+		traceError(span, err)
+		return nil, err
 	}
-
-	err := fmt.Errorf("unknown authentication method: %s", methodToString(method))
-	traceError(span, err)
-	return nil, err
 }
 
 // authReq returns a http request for authenticating to Vault
@@ -116,7 +115,7 @@ func loginBuffer(lt interface{}) (*bytes.Buffer, error) {
 func getJWT(k8ServicePath string) (string, error) {
 	b, err := os.ReadFile(k8ServicePath)
 	if err == nil {
-		//return "", fmt.Errorf("failed to read jwt token from %s: %w", k8ServicePath, err)
+		// return "", fmt.Errorf("failed to read jwt token from %s: %w", k8ServicePath, err)
 		return string(bytes.TrimSpace(b)), nil
 	}
 

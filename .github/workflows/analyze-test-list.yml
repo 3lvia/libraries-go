@@ -1,0 +1,106 @@
+name: Analyze, test
+
+on:
+  push:
+    branches: [trunk]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+  pull_request:
+    branches: [trunk]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: elvia-runner
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: 3lvia/core-github-actions-templates/analyze@trunk
+        with:
+          language: 'go'
+
+  test_mschema:
+    name: Test MSchema
+    runs-on: elvia-runner
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: 'pkg/mschema/go.sum'
+          go-version-file: 'pkg/mschema/go.mod'
+
+      - name: Run tests
+        run: |
+          cd pkg/mschema
+          go test -v ./...
+
+  test_hashivault:
+    name: Test Hashivault
+    runs-on: elvia-runner
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: 'pkg/hashivault/go.sum'
+          go-version-file: 'pkg/hashivault/go.mod'
+
+      - name: Run tests
+        run: |
+          cd pkg/hashivault
+          go test -v ./...
+
+  test_elvid:
+    name: Test Elvid
+    runs-on: elvia-runner
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: 'pkg/elvid/go.sum'
+          go-version-file: 'pkg/elvid/go.mod'
+
+      - name: Run tests
+        run: |
+            cd pkg/elvid
+            go test -v ./...
+
+  test_kafkaclient:
+    name: Test Kafka Client
+    runs-on: elvia-runner
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: 'pkg/kafkaclient/go.sum'
+          go-version-file: 'pkg/kafkaclient/go.mod'
+
+      - name: Run tests
+        run: |
+            cd pkg/kafkaclient
+            go test -v ./...

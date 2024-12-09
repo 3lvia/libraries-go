@@ -2,18 +2,17 @@ package kafkaclient
 
 import (
 	"context"
-	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/3lvia/libraries-go/pkg/hashivault"
 )
-
-func Demo() {
-
-}
 
 func TestStartConsumer(t *testing.T) {
 	ctx := context.Background()
+
+	t.Skip("skipping test")
 
 	vaultAddr := "https://vault.dev-elvia.io"
 	if err := os.Setenv("VAULT_ADDR", vaultAddr); err != nil {
@@ -22,7 +21,7 @@ func TestStartConsumer(t *testing.T) {
 
 	v, errChan, err := hashivault.New(
 		ctx,
-		hashivault.WithOIDC(),
+		hashivault.WithKubernetes("elvia", "elvia"),
 		hashivault.WithVaultAddress(vaultAddr),
 	)
 	if err != nil {
@@ -39,7 +38,14 @@ func TestStartConsumer(t *testing.T) {
 	topic := "private.dp.edna.examples"
 	application := "democonsumer-2"
 
-	stream, err := StartConsumer(ctx, system, topic, application, WithSecretsManager(v))
+	opts := []Option{
+		WithSecretsResolver(K8sSecrets{secrets: v}),
+	}
+
+	stream, err := StartConsumer(ctx, system, topic, application, opts...)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	msg := <-stream
 	_ = msg

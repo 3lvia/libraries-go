@@ -3,9 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/3lvia/libraries-go/pkg/mschema"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 const (
@@ -35,6 +36,9 @@ func init() {
 
 func runList(ctx context.Context) {
 	registry, errChan, err := getRegistry(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	go func(ch <-chan error) {
 		for {
@@ -50,11 +54,11 @@ func runList(ctx context.Context) {
 		log.Fatal(err)
 	}
 
-	//store := storageFolder != ""
+	// store := storageFolder != ""
 	for _, descriptor := range descriptors {
-		//fmt.Printf("%d\t%s\t%s\n", descriptor.ID(), descriptor.Subject(), mschema.TypeName(descriptor.Type()))
+		// fmt.Printf("%d\t%s\t%s\n", descriptor.ID(), descriptor.Subject(), mschema.TypeName(descriptor.Type()))
 		fmt.Println(descriptor.Subject())
-		//if store {
+		// if store {
 		//	sf := storageFolder + "/avsc"
 		//	if descriptor.Type() != mschema.AVRO {
 		//		sf = storageFolder + "/json"
@@ -68,7 +72,7 @@ func runList(ctx context.Context) {
 		//	if _, err := f.WriteString(descriptor.Schema()); err != nil {
 		//		log.Fatal(err)
 		//	}
-		//}
+		// }
 	}
 }
 

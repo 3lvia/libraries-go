@@ -1,13 +1,14 @@
 package kafkaclient
 
 import (
+	"net/http"
+
 	"github.com/3lvia/libraries-go/pkg/hashivault"
 	"github.com/3lvia/libraries-go/pkg/mschema"
-	"net/http"
 )
 
 type optionsCollector struct {
-	secrets     hashivault.SecretsManager
+	secrets     SecretsResolver
 	creatorFunc EntityCreatorFunc
 	client      *http.Client
 	format      mschema.Type
@@ -20,7 +21,17 @@ type Option func(*optionsCollector)
 // WithSecretsManager sets the secrets manager to use when fetching secrets. In future versions, configuration via
 // environment variables may be supported, but for now, this is the only way to configure the package. Hence, it is
 // currently not really optional, and an error is returned if no secrets manager is provided in StartConsumer/Producer.
+// Deprecated: use WithSecretsResolver instead.
 func WithSecretsManager(secrets hashivault.SecretsManager) Option {
+	return func(o *optionsCollector) {
+		o.secrets = K8sSecrets{secrets: secrets}
+	}
+}
+
+// WithSecretsResolver sets the secrets resolver to use when fetching secrets. In future versions, configuration via
+// environment variables may be supported, but for now, this is the only way to configure the package. Hence, it is
+// currently not really optional, and an error is returned if no secrets resolver is provided in StartConsumer/Producer.
+func WithSecretsResolver(secrets SecretsResolver) Option {
 	return func(o *optionsCollector) {
 		o.secrets = secrets
 	}
