@@ -40,11 +40,17 @@ func WithGitHubToken(token string) Option {
 	}
 }
 
-// WithOIDC sets the authentication method to OIDC.
-func WithOIDC(disableCache bool) Option {
+// WithOIDC sets the authentication method to OIDC. This will use the default OIDC configuration.
+func WithOIDC() Option {
 	return func(o *optionsCollector) {
 		o.useOIDC = true
-		o.useOIDCDisableCache = disableCache
+	}
+}
+
+// WithOIDCUseCache sets whether to use the OIDC cache. If useCache is true the cache is used, otherwise it is disabled.
+func WithOIDCUseCache(useCache bool) Option {
+	return func(o *optionsCollector) {
+		o.useOIDCDisableCache = !useCache
 	}
 }
 
