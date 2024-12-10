@@ -40,7 +40,7 @@ func WithGitHubToken(token string) Option {
 	}
 }
 
-// WithOIDC sets the authentication method to OIDC.
+// WithOIDC sets the authentication method to OIDC. This will use the default OIDC configuration.
 func WithOIDC() Option {
 	return func(o *optionsCollector) {
 		o.useOIDC = true
