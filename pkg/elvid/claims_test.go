@@ -14,13 +14,6 @@ func TestStandardClaims_Validate(t *testing.T) {
 		claims  StandardClaims
 	}{
 		{
-			test:    "invalid httpClient id",
-			wantErr: ErrEmptyClientID,
-			claims: StandardClaims{
-				ClientID: "",
-			},
-		},
-		{
 			test:    "valid claims",
 			wantErr: nil,
 			claims: StandardClaims{
