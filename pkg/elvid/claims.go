@@ -1,7 +1,13 @@
 package elvid
 
 import (
+	"errors"
+
 	"github.com/golang-jwt/jwt/v5"
+)
+
+var (
+	ErrEmptyClientID = errors.New("the clientid is empty")
 )
 
 // Claims is an interface that represents the claims fields in a JWT.
@@ -22,5 +28,9 @@ type StandardClaims struct {
 
 // Validate validates the parsed claims in a JWT.
 func (c StandardClaims) Validate() error {
+	if c.ClientID == "" {
+		return ErrEmptyClientID
+	}
+
 	return nil
 }
