@@ -128,13 +128,21 @@ import (
 			}
 		}(errChan)
 
+		// Get a map of several secrets.
 		secret, err := v.GetSecret(ctx, "kunde/kv/data/appinsights/kunde")
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Supports dynamic secrets, i.e. when calling the function `secret`, the latest version of the secret is returned.
 		mapOfSecrets := secret()
 		_ = mapOfSecrets
+
+		// Get a single (static) secret at a given key.
+		staticSecret, err := v.GetStaticSecretAtKey(ctx, "kunde/kv/data/appinsights/kunde", "connection_string")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 ```
