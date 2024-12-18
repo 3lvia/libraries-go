@@ -10,6 +10,11 @@ type SecretsManager interface {
 	// safe to use concurrently.
 	GetSecret(ctx context.Context, path string) (EvergreenSecretsFunc, error)
 
+	// GetStaticSecretAtKey wraps the GetSecret function and only gets a single secret at the given key.
+	// NOTE: If you have dynamic secrets that might change, you should use GetSecret and call the returned
+	// function every time you need the secret.
+	GetStaticSecretAtKey(ctx context.Context, path, key string) (string, error)
+
 	// SetDefaultGoogleCredentials fetches the Google credentials from the given path and key and sets them as the
 	// default credentials for the current process. This means saving the credentials to disk and setting the
 	// environment variable GOOGLE_APPLICATION_CREDENTIALS to point to the saved file.
