@@ -56,6 +56,8 @@ func (m *manager) GetSecret(ctx context.Context, path string) (EvergreenSecretsF
 	return es.get, nil
 }
 
+// Wrapper around GetSecret that gets only a single secret at the given key.
+// NOTE: If you have dynamic secrets that might change, you should use GetSecret and call the returned function every time you need the secret.
 func (m *manager) GetSecretAtKey(ctx context.Context, path, key string) (string, error) {
 	secret, err := m.GetSecret(ctx, path)
 	if err != nil {
