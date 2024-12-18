@@ -56,6 +56,25 @@ func (m *manager) GetSecret(ctx context.Context, path string) (EvergreenSecretsF
 	return es.get, nil
 }
 
+func (m *manager) GetSecretAtKey(ctx context.Context, path, key string) (string, error) {
+	secret, err := m.GetSecret(ctx, path)
+	if err != nil {
+		return "", err
+	}
+
+	secretMap := secret()
+	if _, ok := secretMap[key]; !ok {
+		return "", fmt.Errorf("key %s not found in secret map", key)
+	}
+
+	secretString, ok := secretMap[key].(string)
+	if !ok {
+		return "", fmt.Errorf("could not convert secret at key %s to string", key)
+	}
+
+	return secretString, nil
+}
+
 func (m *manager) SetDefaultGoogleCredentials(ctx context.Context, path, key string) error {
 	m.l.Print("setting default google credentials")
 
