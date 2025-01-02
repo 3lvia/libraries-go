@@ -3,7 +3,7 @@ module github.com/3lvia/libraries-go/pkg/hashivault
 go 1.23
 
 require (
-	github.com/hashicorp/cap v0.7.0
+	github.com/hashicorp/cap v0.8.0
 	github.com/hashicorp/go-secure-stdlib/base62 v0.1.2
 	github.com/hashicorp/vault/api v1.15.0
 	go.opentelemetry.io/otel v1.33.0
