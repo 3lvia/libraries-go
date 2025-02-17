@@ -1,24 +1,24 @@
-name: Elvia Test
+name: Mschema Test
 
 on:
   push:
     branches: [trunk]
     paths:
-      - '.github/workflows/elvia-test.yml'
-      - 'pkg/elvia/**/*.go'
-      - 'pkg/elvia/go.mod'
-      - 'pkg/elvia/go.sum'
+      - '.github/workflows/mschema-test.yml'
+      - 'pkg/mschema/**/*.go'
+      - 'pkg/mschema/go.mod'
+      - 'pkg/mschema/go.sum'
   pull_request:
     branches: [trunk]
     paths:
-      - '.github/workflows/elvia-test.yml'
-      - 'pkg/elvia/**/*.go'
-      - 'pkg/elvia/go.mod'
-      - 'pkg/elvia/go.sum'
+      - '.github/workflows/mschema-test.yml'
+      - 'pkg/mschema/**/*.go'
+      - 'pkg/mschema/go.mod'
+      - 'pkg/mschema/go.sum'
 
 defaults:
   run:
-    working-directory: ./pkg/elvia
+    working-directory: ./pkg/mschema
 
 jobs:
   test:
@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: pkg/elvia/go.sum
+          cache-dependency-path: pkg/mschema/go.sum
       - name: Install Go packages
         run: |
           go mod download
@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Go-results-${{ matrix.go-version }}
-          path: pkg/elvia/tests-${{ matrix.go-version }}.json
+          path: pkg/mschema/tests-${{ matrix.go-version }}.json
       - name: Prepare Test Report
         run: go-ctrf-json-reporter -o ${{ github.workspace }}/ctrf-${{ matrix.go-version }}.json < tests-${{ matrix.go-version }}.json
         if: always()
