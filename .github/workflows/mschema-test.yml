@@ -1,4 +1,4 @@
-name: Mschema Test
+name: MSchema Test
 
 on:
   push:
