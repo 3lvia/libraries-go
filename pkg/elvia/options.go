@@ -91,7 +91,22 @@ func WithEnv(env runtime.Env) ServiceOpt {
 	}
 }
 
+// WithEnvLoggerLevel sets the log level of the service based on the environment.
+// The log level is set to debug for development and test environments, and to warn for production.
+func WithEnvLoggerLevel(env runtime.Env) ServiceOpt {
+	return func(c *config) {
+		c.env = env
+		logLevel := c.loggerLevel
+		switch env {
+		case runtime.Development, runtime.Test:
+			logLevel = slog.LevelDebug
+		}
+		c.loggerLevel = logLevel
+	}
+}
+
 // WithLoggerLevel sets the log level of the service.
+// The default log level is warn.
 func WithLoggerLevel(level slog.Level) ServiceOpt {
 	return func(c *config) {
 		c.loggerLevel = level

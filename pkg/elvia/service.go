@@ -15,6 +15,7 @@ import (
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/log/global"
+	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
@@ -63,7 +64,7 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 		otel.SetTracerProvider(traceProvider)
 	}
 
-	loggerProvider, err := cfg.otelNewLoggerProvider(ctx, cfg.env)
+	loggerProvider, err := cfg.otelNewLoggerProvider(ctx, cfg.env, log.WithResource(r))
 	if err != nil {
 		return nil, err
 	}
