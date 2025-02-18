@@ -54,8 +54,10 @@ func Test_Service(t *testing.T) {
 		ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 		defer cancel()
 
-		if err := svc.Run(ctx); err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
+		err = svc.Run(ctx)
+		require.NoError(t, err)
+
+		err = svc.Stop(ctx)
+		require.NoError(t, err)
 	})
 }
