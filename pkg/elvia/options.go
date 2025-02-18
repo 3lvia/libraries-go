@@ -39,8 +39,8 @@ type NewApiEngine func(env runtime.Env) *gin.Engine
 // ConfigureApiEndpoint is a function to configure API endpoints.
 type ConfigureApiEndpoint func(engine *gin.Engine)
 
-// Opt is a function to configure the service.
-type Opt func(*config)
+// ServiceOpt is a function to configure the service.
+type ServiceOpt func(*config)
 
 type config struct {
 	env runtime.Env
@@ -85,14 +85,14 @@ func defaultConfig(name string) config {
 
 // WithEnv sets the environment of the service.
 // This setting can affect the configuration of multiple components.
-func WithEnv(env runtime.Env) Opt {
+func WithEnv(env runtime.Env) ServiceOpt {
 	return func(c *config) {
 		c.env = env
 	}
 }
 
 // WithLoggerLevel sets the log level of the service.
-func WithLoggerLevel(level slog.Level) Opt {
+func WithLoggerLevel(level slog.Level) ServiceOpt {
 	return func(c *config) {
 		c.loggerLevel = level
 	}
@@ -100,35 +100,35 @@ func WithLoggerLevel(level slog.Level) Opt {
 
 // WithOTELAttributes sets the OpenTelemetry attributes of the service.
 // You don't have to set the service name attribute as it is set automatically.
-func WithOTELAttributes(attrs ...attribute.KeyValue) Opt {
+func WithOTELAttributes(attrs ...attribute.KeyValue) ServiceOpt {
 	return func(c *config) {
 		c.otelAttributes = append(c.otelAttributes, attrs...)
 	}
 }
 
 // WithOTELPropagator sets the OpenTelemetry propagator of the service.
-func WithOTELPropagator(propagation propagation.TextMapPropagator) Opt {
+func WithOTELPropagator(propagation propagation.TextMapPropagator) ServiceOpt {
 	return func(c *config) {
 		c.otelPropagator = propagation
 	}
 }
 
 // WithOTELTraceProvider sets the OpenTelemetry trace provider of the service.
-func WithOTELTraceProvider(provider NewTraceProvider) Opt {
+func WithOTELTraceProvider(provider NewTraceProvider) ServiceOpt {
 	return func(c *config) {
 		c.otelNewTraceProvider = provider
 	}
 }
 
 // WithOTELLoggerProvider sets the OpenTelemetry logger provider of the service.
-func WithOTELLoggerProvider(provider NewLoggerProvider) Opt {
+func WithOTELLoggerProvider(provider NewLoggerProvider) ServiceOpt {
 	return func(c *config) {
 		c.otelNewLoggerProvider = provider
 	}
 }
 
 // WithOTELMetricProvider sets the OpenTelemetry metric provider of the service.
-func WithOTELMetricProvider(provider NewMetricProvider) Opt {
+func WithOTELMetricProvider(provider NewMetricProvider) ServiceOpt {
 	return func(c *config) {
 		c.otelNewMetricProvider = provider
 	}
@@ -138,21 +138,21 @@ func WithOTELMetricProvider(provider NewMetricProvider) Opt {
 // The standard API configures a Gin engine with standard endpoints for health, metrics, and not found.
 // See WithAPIEngine and WithAPIEndpoints for more control over the API, and optionally WithHTTPServer to set the HTTP server.
 // If the address is empty, the API will be disabled. Use DisableAPI for this purpose.
-func WithAPI(addr string) Opt {
+func WithAPI(addr string) ServiceOpt {
 	return func(c *config) {
 		c.withApiAddr = addr
 	}
 }
 
 // WithHTTPServer sets the HTTP server of the service.
-func WithHTTPServer(server *http.Server) Opt {
+func WithHTTPServer(server *http.Server) ServiceOpt {
 	return func(c *config) {
 		c.withHTTPServer = server
 	}
 }
 
 // WithAPIEngine sets the API engine of the service.
-func WithAPIEngine(engine NewApiEngine) Opt {
+func WithAPIEngine(engine NewApiEngine) ServiceOpt {
 	return func(c *config) {
 		c.withApiEngine = engine
 	}
@@ -162,7 +162,7 @@ func WithAPIEngine(engine NewApiEngine) Opt {
 // The default endpoints are standard endpoints for health, metrics, and not found.
 // To add custom endpoints, use this option, and optionally include the standard endpoints
 // found in api.ConfigureStandardEndpoints, api.ConfigureStandardMetricsEndpoint, and api.ConfigureStandardHealthEndpoint.
-func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) Opt {
+func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) ServiceOpt {
 	return func(c *config) {
 		c.withApiEndpoints = endpoints
 	}

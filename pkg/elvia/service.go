@@ -3,6 +3,7 @@ package elvia
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -28,9 +29,11 @@ type Service struct {
 	shutdownFuncs []shutdownFunc
 }
 
-// New creates a new service with the given service name and options.
-func New(ctx context.Context, serviceName string, opts ...Opt) (*Service, error) {
-	cfg := defaultConfig(serviceName)
+// NewService creates a new service with the given service name and options.
+func NewService(ctx context.Context, systemName, serviceName string, opts ...ServiceOpt) (*Service, error) {
+	name := fmt.Sprintf("%s.%s", systemName, serviceName)
+
+	cfg := defaultConfig(name)
 	for _, opt := range opts {
 		opt(&cfg)
 	}
@@ -68,7 +71,7 @@ func New(ctx context.Context, serviceName string, opts ...Opt) (*Service, error)
 		shutdownFuncs = append(shutdownFuncs, loggerProvider.Shutdown)
 		global.SetLoggerProvider(loggerProvider)
 
-		logger = runtime.LoggerFanout(logger, otelslog.NewHandler(serviceName, otelslog.WithLoggerProvider(loggerProvider)))
+		logger = runtime.LoggerFanout(logger, otelslog.NewHandler(name, otelslog.WithLoggerProvider(loggerProvider)))
 	}
 
 	metricProvider, err := cfg.otelNewMetricProvider(ctx, cfg.env)
@@ -114,6 +117,7 @@ func New(ctx context.Context, serviceName string, opts ...Opt) (*Service, error)
 
 // Run starts the service and blocks until the service is stopped.
 // The stopping mechanism is when the context is cancelled or a SIGINT or SIGTERM signal is received.
+// Stop should be called to stop the service.
 func (s *Service) Run(ctx context.Context) error {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
@@ -140,7 +144,7 @@ func (s *Service) Run(ctx context.Context) error {
 		slog.InfoContext(ctx, "shutting down service")
 	}
 
-	return s.Stop(ctx)
+	return nil
 }
 
 // Stop stops the service and all its components.

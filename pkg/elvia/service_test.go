@@ -22,7 +22,7 @@ func Test_Service(t *testing.T) {
 
 		otelWasCalled := make([]bool, 3)
 
-		opts := []Opt{
+		opts := []ServiceOpt{
 			WithEnv(runtime.Development),
 			WithLoggerLevel(slog.LevelDebug),
 			WithOTELAttributes(
@@ -44,7 +44,7 @@ func Test_Service(t *testing.T) {
 			WithAPI(DisableAPI),
 		}
 
-		svc, err := New(ctx, "test", opts...)
+		svc, err := NewService(ctx, "test", "test", opts...)
 		require.NoError(t, err)
 
 		require.True(t, otelWasCalled[0])
