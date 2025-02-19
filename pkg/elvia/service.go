@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/3lvia/libraries-go/pkg/elvia/api"
 	"github.com/3lvia/libraries-go/pkg/elvia/runtime"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel"
@@ -84,7 +85,10 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 		otel.SetMeterProvider(metricProvider)
 	}
 
+	var apiServer *http.Server
 	if cfg.withApiAddr != DisableAPI {
+		slog.Info("API server is enabled", "addr", cfg.withApiAddr)
+
 		engine := cfg.withApiEngine(cfg.env)
 		if engine != nil {
 			for _, endpoint := range cfg.withApiEndpoints {
@@ -92,10 +96,12 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 			}
 		}
 
-		apiServer := &http.Server{
-			Addr:    cfg.withApiAddr,
-			Handler: engine,
+		if cfg.withHTTPServer != nil {
+			apiServer = cfg.withHTTPServer
+		} else {
+			apiServer = api.NewDefaultServer(cfg.withApiAddr, engine)
 		}
+
 		shutdownFuncs = append(shutdownFuncs, func(ctx context.Context) error {
 			slog.InfoContext(ctx, "API server is shutting down")
 			defer slog.InfoContext(ctx, "API server has shut down")
@@ -112,7 +118,7 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 	return &Service{
 		logger:        logger,
 		shutdownFuncs: shutdownFuncs,
-		apiServer:     cfg.withHTTPServer,
+		apiServer:     apiServer,
 	}, nil
 }
 
@@ -127,6 +133,7 @@ func (s *Service) Run(ctx context.Context) error {
 	if s.apiServer != nil {
 		apiErrChan = make(chan error, 1)
 		go func() {
+			slog.InfoContext(ctx, "API server started", "addr", s.apiServer.Addr)
 			err := s.apiServer.ListenAndServe()
 			apiErrChan <- err
 		}()

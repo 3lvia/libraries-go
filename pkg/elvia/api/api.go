@@ -12,6 +12,14 @@ import (
 	sloggin "github.com/samber/slog-gin"
 )
 
+// NewDefaultServer creates a new HTTP server with default settings.
+func NewDefaultServer(addr string, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:    addr,
+		Handler: handler,
+	}
+}
+
 // NewDefaultEngine creates a new gin engine with default middleware.
 // The environment is used to set the gin mode.
 func NewDefaultEngine(env runtime.Env) *gin.Engine {

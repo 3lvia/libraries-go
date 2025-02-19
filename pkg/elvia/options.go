@@ -74,6 +74,7 @@ func defaultConfig(name string) config {
 		otelNewLoggerProvider: observability.NewDefaultLoggerProvider,
 		otelNewMetricProvider: observability.NewDefaultMetricProvider,
 		withApiAddr:           DefaultAPIAddr,
+		withHTTPServer:        nil,
 		withApiEngine:         api.NewDefaultEngine,
 		withApiEndpoints: []ConfigureApiEndpoint{
 			api.ConfigureStandardEndpoints,
