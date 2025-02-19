@@ -21,19 +21,6 @@ defaults:
     working-directory: ./pkg/mschema
 
 jobs:
-  analyze:
-    name: Analyze
-    runs-on: elvia-runner
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    steps:
-      - uses: 3lvia/core-github-actions-templates/analyze@trunk
-        with:
-          working-directory: './pkg/mschema'
-          language: 'go'
-
   test:
     name: Test
     runs-on: elvia-runner
