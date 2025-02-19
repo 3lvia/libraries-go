@@ -21,6 +21,19 @@ defaults:
     working-directory: ./pkg/elvid
 
 jobs:
+  analyze:
+    name: Analyze
+    runs-on: elvia-runner
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: 3lvia/core-github-actions-templates/analyze@trunk
+        with:
+          working-directory: './pkg/elvid'
+          language: 'go'
+
   test:
     name: Test
     runs-on: elvia-runner
