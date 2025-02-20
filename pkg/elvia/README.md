@@ -11,7 +11,7 @@ Common functionality includes:
 ## Installation
 
 ```bash
-go get github.com/3lvia/libraires-go/pkg/elvia
+go get github.com/3lvia/libraries-go/pkg/elvia
 ```
 
 ## Usage
@@ -54,17 +54,34 @@ func main() {
 ```
 
 Even though the service can run on its own, it is likely that you will want additional components for your service.
+Wrap the service in a struct and add additional components as needed.
 
 ```go
 package main
 
+import (
+	"context"
+	"log/slog"
+
+	"github.com/3lvia/libraries-go/pkg/elvia"
+	"github.com/3lvia/libraries-go/pkg/elvia/runtime"
+	"golang.org/x/telemetry/internal/config"
+)
+
 type MyService struct {
 	*elvia.Service
+
 	// Add additional components here
 }
 
-func NewMyService(ctx context.Context) (*MyService, error) {
-	svc, err := elvia.NewService(ctx, "my-system", "my-service")
+func NewMyService(ctx context.Context, cfg *Config) (*MyService, error) {
+	// Configure the elvia service with elvia.With... options
+	opts := []elvia.ServiceOpt{
+		elvia.WithEnvLoggerLevel(cfg.Env),
+		elvia.WithAPI(cfg.APIAddr),
+	}
+
+	svc, err := elvia.NewService(ctx, "my-system", "my-service", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,31 +92,32 @@ func NewMyService(ctx context.Context) (*MyService, error) {
 }
 
 func (s *MyService) Run(ctx context.Context) error {
-	// Do something before running the service
-	err := s.Service.Run(ctx)
-	if err != nil {
-		return err
-	}
+	// Start additional components here
 
-	// Do something after running the service
-	return nil
+	return s.Service.Run(ctx)
 }
 
 func (s *MyService) Stop(ctx context.Context) error {
-	// Do something before stopping the service
-	err := s.Service.Stop(ctx)
-	if err != nil {
-		return err
-	}
+	// Stop additional components here
 
-	// Do something after stopping the service
-	return nil
+	return s.Service.Stop(ctx)
+}
+
+type Config struct {
+	Env runtime.Env
+    APIAddr string
 }
 
 func main() {
+	// Load your configuration
+	cfg := &Config{
+        Env: runtime.Development,
+        APIAddr: ":8080",
+    }
+	
 	ctx := context.Background()
 
-	svc, err := NewMyService(ctx)
+	svc, err := NewMyService(ctx, cfg)
 	if err != nil {
 		slog.Error("failed to create service", "error", err)
 		panic(err)
@@ -116,20 +134,5 @@ func main() {
 		slog.Error("failed to stop service", "error", err)
 		panic(err)
 	}
-}
-```
-
-## Options
-
-The `elvia.NewService` function takes in optional `elvia.ServiceOpt` options. Use the `elvia.With...` functions to add them.
-
-```go
-func main() {
-    opts := []elvia.ServiceOpt{
-		elvia.WithEnvironment(runtime.Development),
-		elvia.WithLoggerLevel(slog.LevelDebug),
-    }
-    
-    svc, err := elvia.NewService(ctx, "my-system", "my-service", opts...)
 }
 ```
