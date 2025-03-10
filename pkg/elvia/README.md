@@ -136,3 +136,45 @@ func main() {
     }
 }
 ```
+
+## Register shutdown hooks
+
+You can register shutdown hooks to run when the service is stopped. This can be used to gracefully shutdown additional components.
+
+```go
+svc, err := elvia.NewService(ctx, "my-system", "my-service")
+if err != nil {
+    return nil, err
+}
+
+component := &Component{}
+svc.RegisterShutdown(component.Close)
+```
+
+## Register health checks
+
+You can register health checks to be used by the health endpoint.
+
+```go
+svc, err := elvia.NewService(ctx, "my-system", "my-service")
+if err != nil {
+    return nil, err
+}
+
+component := &Component{}
+
+svc.RegisterHealthCheck(func() probe.HealthReport {
+	if component.Healthy() {
+        return probe.HealthReport{
+            Name:   "component",
+            Status: probe.Healthy,
+        }
+    }
+	
+	return probe.HealthReport{
+        Name:   "component",
+        Status: probe.Unhealthy,
+        Error:  "component is unhealthy",
+    }
+})
+```
