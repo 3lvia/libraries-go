@@ -41,7 +41,7 @@ type NewApiEngine func(env runtime.Env) *gin.Engine
 type ConfigureApiEndpoint func(engine *gin.Engine)
 
 // ConfigureApiHealthEndpoint is a function to configure the probe endpoint.
-type ConfigureApiHealthEndpoint func(engine *gin.Engine, healthReports probe.HealthChecksFunc)
+type ConfigureApiHealthEndpoint func(engine *gin.Engine, fn probe.HealthChecksFunc)
 
 // ServiceOpt is a function to configure the service.
 type ServiceOpt func(*config)
@@ -51,13 +51,12 @@ type config struct {
 
 	loggerLevel slog.Level
 
-	otelEnabled              bool
-	otelExporterOtlpEndpoint string
-	otelAttributes           []attribute.KeyValue
-	otelPropagator           propagation.TextMapPropagator
-	otelNewTraceProvider     NewTraceProvider
-	otelNewLoggerProvider    NewLoggerProvider
-	otelNewMetricProvider    NewMetricProvider
+	otelEnabled           bool
+	otelAttributes        []attribute.KeyValue
+	otelPropagator        propagation.TextMapPropagator
+	otelNewTraceProvider  NewTraceProvider
+	otelNewLoggerProvider NewLoggerProvider
+	otelNewMetricProvider NewMetricProvider
 
 	withApiAddr           string
 	withHTTPServer        *http.Server
@@ -68,10 +67,9 @@ type config struct {
 
 func defaultConfig(name string) config {
 	return config{
-		env:                      runtime.Production,
-		loggerLevel:              slog.LevelWarn,
-		otelEnabled:              true,
-		otelExporterOtlpEndpoint: observability.OTELExporterOTLPEndpointDefault,
+		env:         runtime.Production,
+		loggerLevel: slog.LevelWarn,
+		otelEnabled: true,
 		otelAttributes: []attribute.KeyValue{
 			semconv.ServiceName(name),
 		},
@@ -135,18 +133,6 @@ func WithOTELDisabled() ServiceOpt {
 	}
 }
 
-// WithOTELExporterOTLPEndpoint sets the OpenTelemetry OTLP exporter endpoint of the service.
-// The default endpoint is localhost:4317.
-// OTEL_EXPORTER_OTLP_ENDPOINT environment variable will override this setting.
-func WithOTELExporterOTLPEndpoint(endpoint string) ServiceOpt {
-	return func(c *config) {
-		c.otelExporterOtlpEndpoint = endpoint
-		if ep := observability.GetOTELExporterOTLPEndpoint(); ep != "" {
-			c.otelExporterOtlpEndpoint = ep
-		}
-	}
-}
-
 // WithOTELAttributes sets the OpenTelemetry attributes of the service.
 // You don't have to set the service name attribute as it is set automatically.
 func WithOTELAttributes(attrs ...attribute.KeyValue) ServiceOpt {
@@ -184,7 +170,7 @@ func WithOTELMetricProvider(provider NewMetricProvider) ServiceOpt {
 }
 
 // WithAPI sets the API address of the service.
-// The standard API configures a Gin engine with standard endpoints for probe, metrics, and not found.
+// The standard API configures a Gin engine with standard endpoints for health, metrics, and not found.
 // See WithAPIEngine and WithAPIEndpoints for more control over the API, and optionally WithHTTPServer to set the HTTP server.
 // If the address is empty, the API will be disabled. Use DisableAPI for this purpose.
 func WithAPI(addr string) ServiceOpt {
@@ -217,8 +203,7 @@ func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) ServiceOpt {
 	}
 }
 
-// WithAPIHealthEndpoint sets the probe endpoint of the service.
-// The probe endpoint is a function that adds a probe check endpoint to the API engine.
+// WithAPIHealthEndpoint sets the health endpoint of the service.
 func WithAPIHealthEndpoint(endpoint ConfigureApiHealthEndpoint) ServiceOpt {
 	return func(c *config) {
 		c.withApiHealthEndpoint = endpoint

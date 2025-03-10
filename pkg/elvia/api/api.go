@@ -74,12 +74,12 @@ func ConfigureStandardMetricsEndpoint(engine *gin.Engine) {
 	engine.GET("/metrics", gin.WrapH(promhttp.Handler()))
 }
 
-// ConfigureStandardHealthEndpoint configures a standard probe endpoint for the API.
-// The endpoint is exposed at /probe and returns a JSON response.
-func ConfigureStandardHealthEndpoint(engine *gin.Engine, check probe.HealthChecksFunc) {
+// ConfigureStandardHealthEndpoint configures a standard health endpoint for the API.
+// The endpoint is exposed at /health and returns a JSON response.
+func ConfigureStandardHealthEndpoint(engine *gin.Engine, fn probe.HealthChecksFunc) {
 	engine.GET("/health", func(c *gin.Context) {
-		healths := check()
-		summary := probe.Check(healths)
+		checks := fn()
+		summary := probe.Check(checks)
 
 		httpStatus := http.StatusOK
 		if summary.Status == probe.Unhealthy {
