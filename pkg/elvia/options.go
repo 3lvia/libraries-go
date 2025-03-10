@@ -7,6 +7,7 @@ import (
 
 	"github.com/3lvia/libraries-go/pkg/elvia/api"
 	"github.com/3lvia/libraries-go/pkg/elvia/observability"
+	"github.com/3lvia/libraries-go/pkg/elvia/probe"
 	"github.com/3lvia/libraries-go/pkg/elvia/runtime"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/attribute"
@@ -39,6 +40,9 @@ type NewApiEngine func(env runtime.Env) *gin.Engine
 // ConfigureApiEndpoint is a function to configure API endpoints.
 type ConfigureApiEndpoint func(engine *gin.Engine)
 
+// ConfigureApiHealthEndpoint is a function to configure the probe endpoint.
+type ConfigureApiHealthEndpoint func(engine *gin.Engine, healthReports probe.HealthChecksFunc)
+
 // ServiceOpt is a function to configure the service.
 type ServiceOpt func(*config)
 
@@ -47,22 +51,27 @@ type config struct {
 
 	loggerLevel slog.Level
 
-	otelAttributes        []attribute.KeyValue
-	otelPropagator        propagation.TextMapPropagator
-	otelNewTraceProvider  NewTraceProvider
-	otelNewLoggerProvider NewLoggerProvider
-	otelNewMetricProvider NewMetricProvider
+	otelEnabled              bool
+	otelExporterOtlpEndpoint string
+	otelAttributes           []attribute.KeyValue
+	otelPropagator           propagation.TextMapPropagator
+	otelNewTraceProvider     NewTraceProvider
+	otelNewLoggerProvider    NewLoggerProvider
+	otelNewMetricProvider    NewMetricProvider
 
-	withApiAddr      string
-	withHTTPServer   *http.Server
-	withApiEngine    NewApiEngine
-	withApiEndpoints []ConfigureApiEndpoint
+	withApiAddr           string
+	withHTTPServer        *http.Server
+	withApiEngine         NewApiEngine
+	withApiEndpoints      []ConfigureApiEndpoint
+	withApiHealthEndpoint ConfigureApiHealthEndpoint
 }
 
 func defaultConfig(name string) config {
 	return config{
-		env:         runtime.Production,
-		loggerLevel: slog.LevelWarn,
+		env:                      runtime.Production,
+		loggerLevel:              slog.LevelWarn,
+		otelEnabled:              true,
+		otelExporterOtlpEndpoint: observability.OTELExporterOTLPEndpointDefault,
 		otelAttributes: []attribute.KeyValue{
 			semconv.ServiceName(name),
 		},
@@ -79,8 +88,8 @@ func defaultConfig(name string) config {
 		withApiEndpoints: []ConfigureApiEndpoint{
 			api.ConfigureStandardEndpoints,
 			api.ConfigureStandardMetricsEndpoint,
-			api.ConfigureStandardHealthEndpoint,
 		},
+		withApiHealthEndpoint: api.ConfigureStandardHealthEndpoint,
 	}
 }
 
@@ -111,6 +120,30 @@ func WithEnvLoggerLevel(env runtime.Env) ServiceOpt {
 func WithLoggerLevel(level slog.Level) ServiceOpt {
 	return func(c *config) {
 		c.loggerLevel = level
+	}
+}
+
+// WithOTELDisabled disables OpenTelemetry for the service.
+// OpenTelemetry is enabled by default.
+// OTEL_ENABLED environment variable will override this setting.
+func WithOTELDisabled() ServiceOpt {
+	return func(c *config) {
+		c.otelEnabled = false
+		if observability.IsOTELEnabled() {
+			c.otelEnabled = true
+		}
+	}
+}
+
+// WithOTELExporterOTLPEndpoint sets the OpenTelemetry OTLP exporter endpoint of the service.
+// The default endpoint is localhost:4317.
+// OTEL_EXPORTER_OTLP_ENDPOINT environment variable will override this setting.
+func WithOTELExporterOTLPEndpoint(endpoint string) ServiceOpt {
+	return func(c *config) {
+		c.otelExporterOtlpEndpoint = endpoint
+		if ep := observability.GetOTELExporterOTLPEndpoint(); ep != "" {
+			c.otelExporterOtlpEndpoint = ep
+		}
 	}
 }
 
@@ -151,7 +184,7 @@ func WithOTELMetricProvider(provider NewMetricProvider) ServiceOpt {
 }
 
 // WithAPI sets the API address of the service.
-// The standard API configures a Gin engine with standard endpoints for health, metrics, and not found.
+// The standard API configures a Gin engine with standard endpoints for probe, metrics, and not found.
 // See WithAPIEngine and WithAPIEndpoints for more control over the API, and optionally WithHTTPServer to set the HTTP server.
 // If the address is empty, the API will be disabled. Use DisableAPI for this purpose.
 func WithAPI(addr string) ServiceOpt {
@@ -175,11 +208,19 @@ func WithAPIEngine(engine NewApiEngine) ServiceOpt {
 }
 
 // WithAPIEndpoints sets the API endpoints of the service.
-// The default endpoints are standard endpoints for health, metrics, and not found.
+// The default endpoints are standard endpoints for probe, metrics, and not found.
 // To add custom endpoints, use this option, and optionally include the standard endpoints
 // found in api.ConfigureStandardEndpoints, api.ConfigureStandardMetricsEndpoint, and api.ConfigureStandardHealthEndpoint.
 func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) ServiceOpt {
 	return func(c *config) {
 		c.withApiEndpoints = endpoints
+	}
+}
+
+// WithAPIHealthEndpoint sets the probe endpoint of the service.
+// The probe endpoint is a function that adds a probe check endpoint to the API engine.
+func WithAPIHealthEndpoint(endpoint ConfigureApiHealthEndpoint) ServiceOpt {
+	return func(c *config) {
+		c.withApiHealthEndpoint = endpoint
 	}
 }

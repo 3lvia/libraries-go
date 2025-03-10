@@ -8,11 +8,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"slices"
 	"syscall"
 	"time"
 
 	"github.com/3lvia/libraries-go/pkg/elvia/api"
+	"github.com/3lvia/libraries-go/pkg/elvia/probe"
 	"github.com/3lvia/libraries-go/pkg/elvia/runtime"
+	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/log/global"
@@ -23,13 +26,15 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
-type shutdownFunc func(context.Context) error
+type ShutdownFunc func(context.Context) error
 
 // Service configures standard service components and manages their lifecycle.
 type Service struct {
-	logger        *slog.Logger
-	apiServer     *http.Server
-	shutdownFuncs []shutdownFunc
+	logger           *slog.Logger
+	apiServer        *http.Server
+	apiEngine        *gin.Engine
+	shutdownFuncs    []ShutdownFunc
+	healthCheckFuncs []probe.HealthCheckFunc
 }
 
 // NewService creates a new service with the given service name and options.
@@ -54,53 +59,57 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 		return nil, err
 	}
 
-	shutdownFuncs := make([]shutdownFunc, 0)
-	otel.SetTextMapPropagator(cfg.otelPropagator)
+	shutdownFuncs := make([]ShutdownFunc, 0)
 
-	traceProvider, err := cfg.otelNewTraceProvider(ctx, cfg.env, trace.WithResource(r))
-	if err != nil {
-		return nil, err
-	}
-	if traceProvider != nil {
-		shutdownFuncs = append(shutdownFuncs, traceProvider.Shutdown)
-		otel.SetTracerProvider(traceProvider)
-	}
+	if cfg.otelEnabled {
+		otel.SetTextMapPropagator(cfg.otelPropagator)
 
-	loggerProvider, err := cfg.otelNewLoggerProvider(ctx, cfg.env, log.WithResource(r))
-	if err != nil {
-		return nil, err
-	}
-	if loggerProvider != nil {
-		shutdownFuncs = append(shutdownFuncs, loggerProvider.Shutdown)
-		global.SetLoggerProvider(loggerProvider)
+		traceProvider, err := cfg.otelNewTraceProvider(ctx, cfg.env, trace.WithResource(r))
+		if err != nil {
+			return nil, err
+		}
+		if traceProvider != nil {
+			shutdownFuncs = append(shutdownFuncs, traceProvider.Shutdown)
+			otel.SetTracerProvider(traceProvider)
+		}
 
-		logger = runtime.LoggerFanout(logger, otelslog.NewHandler(name, otelslog.WithLoggerProvider(loggerProvider)))
-	}
+		loggerProvider, err := cfg.otelNewLoggerProvider(ctx, cfg.env, log.WithResource(r))
+		if err != nil {
+			return nil, err
+		}
+		if loggerProvider != nil {
+			shutdownFuncs = append(shutdownFuncs, loggerProvider.Shutdown)
+			global.SetLoggerProvider(loggerProvider)
 
-	metricProvider, err := cfg.otelNewMetricProvider(ctx, cfg.env, metric.WithResource(r))
-	if err != nil {
-		return nil, err
-	}
-	if metricProvider != nil {
-		shutdownFuncs = append(shutdownFuncs, metricProvider.Shutdown)
-		otel.SetMeterProvider(metricProvider)
+			logger = runtime.LoggerFanout(logger, otelslog.NewHandler(name, otelslog.WithLoggerProvider(loggerProvider)))
+		}
+
+		metricProvider, err := cfg.otelNewMetricProvider(ctx, cfg.env, metric.WithResource(r))
+		if err != nil {
+			return nil, err
+		}
+		if metricProvider != nil {
+			shutdownFuncs = append(shutdownFuncs, metricProvider.Shutdown)
+			otel.SetMeterProvider(metricProvider)
+		}
 	}
 
 	var apiServer *http.Server
+	var apiEngine *gin.Engine
 	if cfg.withApiAddr != DisableAPI {
 		slog.Info("API server is enabled", "addr", cfg.withApiAddr)
 
-		engine := cfg.withApiEngine(cfg.env)
-		if engine != nil {
+		apiEngine = cfg.withApiEngine(cfg.env)
+		if apiEngine != nil {
 			for _, endpoint := range cfg.withApiEndpoints {
-				endpoint(engine)
+				endpoint(apiEngine)
 			}
 		}
 
 		if cfg.withHTTPServer != nil {
 			apiServer = cfg.withHTTPServer
 		} else {
-			apiServer = api.NewDefaultServer(cfg.withApiAddr, engine)
+			apiServer = api.NewDefaultServer(cfg.withApiAddr, apiEngine)
 		}
 
 		shutdownFuncs = append(shutdownFuncs, func(ctx context.Context) error {
@@ -116,11 +125,35 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 		})
 	}
 
-	return &Service{
-		logger:        logger,
-		shutdownFuncs: shutdownFuncs,
-		apiServer:     apiServer,
-	}, nil
+	svc := &Service{
+		logger:           logger,
+		shutdownFuncs:    shutdownFuncs,
+		apiServer:        apiServer,
+		apiEngine:        apiEngine,
+		healthCheckFuncs: make([]probe.HealthCheckFunc, 0),
+	}
+
+	if apiEngine != nil && cfg.withApiHealthEndpoint != nil {
+		cfg.withApiHealthEndpoint(apiEngine, func() []probe.HealthReport {
+			healths := make([]probe.HealthReport, 0, len(svc.healthCheckFuncs))
+			for _, check := range svc.healthCheckFuncs {
+				healths = append(healths, check())
+			}
+			return healths
+		})
+	}
+
+	return svc, nil
+}
+
+// RegisterShutdown registers a function that will be run when the service is stopped.
+func (s *Service) RegisterShutdown(fn ShutdownFunc) {
+	s.shutdownFuncs = append(s.shutdownFuncs, fn)
+}
+
+// RegisterHealthCheck registers a probe check function that will be run when the probe endpoint is called.
+func (s *Service) RegisterHealthCheck(fn probe.HealthCheckFunc) {
+	s.healthCheckFuncs = append(s.healthCheckFuncs, fn)
 }
 
 // Run starts the service and blocks until the service is stopped.
@@ -162,7 +195,7 @@ func (s *Service) Stop(ctx context.Context) error {
 	defer cancel()
 
 	var err error
-	for _, fn := range s.shutdownFuncs {
+	for _, fn := range slices.Backward(s.shutdownFuncs) {
 		err = errors.Join(err, fn(ctx))
 	}
 	s.shutdownFuncs = nil

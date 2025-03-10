@@ -2,7 +2,6 @@ package observability
 
 import (
 	"context"
-	"os"
 	"strings"
 	"sync"
 
@@ -13,12 +12,6 @@ import (
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 )
 
-// OTEL_LOG_LEVEL is currently not supported by the go SDK.
-// We provide simple support for it here.
-// Follow the issue:
-// https://github.com/open-telemetry/opentelemetry-go/issues/2303
-const key = "OTEL_LOG_LEVEL"
-
 var getSeverity = sync.OnceValue(func() log.Severity {
 	conv := map[string]log.Severity{
 		"":      log.SeverityInfo, // Default to SeverityInfo for unset.
@@ -28,7 +21,7 @@ var getSeverity = sync.OnceValue(func() log.Severity {
 		"error": log.SeverityError,
 	}
 	// log.SeverityUndefined for unknown values.
-	return conv[strings.ToLower(os.Getenv(key))]
+	return conv[strings.ToLower(GetOTELLogLevel())]
 })
 
 type EnvSeverity struct{}
