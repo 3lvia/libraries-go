@@ -38,7 +38,7 @@ func NewDefaultEngine(env runtime.Env) *gin.Engine {
 		WithSpanID:  true,
 		WithTraceID: true,
 		Filters: []sloggin.Filter{
-			sloggin.IgnorePath("/metrics", "/probe"),
+			sloggin.IgnorePath("/metrics", "/health"),
 		},
 	}))
 	engine.Use(gin.Recovery())
@@ -76,10 +76,10 @@ func ConfigureStandardMetricsEndpoint(engine *gin.Engine) {
 
 // ConfigureStandardHealthEndpoint configures a standard health endpoint for the API.
 // The endpoint is exposed at /health and returns a JSON response.
-func ConfigureStandardHealthEndpoint(engine *gin.Engine, fn probe.HealthChecksFunc) {
+func ConfigureStandardHealthEndpoint(engine *gin.Engine, fn func() probe.HealthReports) {
 	engine.GET("/health", func(c *gin.Context) {
-		checks := fn()
-		summary := probe.Check(checks)
+		reports := fn()
+		summary := probe.Check(reports)
 
 		httpStatus := http.StatusOK
 		if summary.Status == probe.Unhealthy {

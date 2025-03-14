@@ -163,16 +163,14 @@ if err != nil {
 
 component := &Component{}
 
-svc.RegisterHealthCheck(func() probe.HealthReport {
+svc.RegisterHealthCheck("component", func() probe.HealthReport {
 	if component.Healthy() {
         return probe.HealthReport{
-            Name:   "component",
             Status: probe.Healthy,
         }
     }
 	
 	return probe.HealthReport{
-        Name:   "component",
         Status: probe.Unhealthy,
         Error:  "component is unhealthy",
     }

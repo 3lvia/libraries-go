@@ -40,8 +40,8 @@ type NewApiEngine func(env runtime.Env) *gin.Engine
 // ConfigureApiEndpoint is a function to configure API endpoints.
 type ConfigureApiEndpoint func(engine *gin.Engine)
 
-// ConfigureApiHealthEndpoint is a function to configure the probe endpoint.
-type ConfigureApiHealthEndpoint func(engine *gin.Engine, fn probe.HealthChecksFunc)
+// ConfigureApiHealthEndpoint is a function to configure the health endpoint.
+type ConfigureApiHealthEndpoint func(engine *gin.Engine, fn func() probe.HealthReports)
 
 // ServiceOpt is a function to configure the service.
 type ServiceOpt func(*config)
@@ -194,7 +194,7 @@ func WithAPIEngine(engine NewApiEngine) ServiceOpt {
 }
 
 // WithAPIEndpoints sets the API endpoints of the service.
-// The default endpoints are standard endpoints for probe, metrics, and not found.
+// The default endpoints are standard endpoints for metrics, and not found.
 // To add custom endpoints, use this option, and optionally include the standard endpoints
 // found in api.ConfigureStandardEndpoints, api.ConfigureStandardMetricsEndpoint, and api.ConfigureStandardHealthEndpoint.
 func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) ServiceOpt {

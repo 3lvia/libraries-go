@@ -15,27 +15,29 @@ const (
 // String returns the string representation of the health status.
 func (s HealthStatus) String() string { return string(s) }
 
-// HealthReport represents the probe of a service.
+// HealthReport represents the health of a service.
 type HealthReport struct {
 	Status HealthStatus `json:"status"`
-	Name   string       `json:"name"`
 	Error  string       `json:"error,omitempty"`
 }
 
-// HealthSummary represents a summary of the probe of the services.
+// HealthSummary represents a summary of the health of the services.
 type HealthSummary struct {
-	Status   HealthStatus   `json:"status"`
-	Services []HealthReport `json:"services,omitempty"`
+	Status   HealthStatus            `json:"status"`
+	Services map[string]HealthReport `json:"services,omitempty"`
 }
 
-// HealthCheckFunc is a function that returns the probe of a service.
-type HealthCheckFunc func() HealthReport
+// HealthReportFunc is a function that returns the health of a service.
+type HealthReportFunc func() HealthReport
 
-// HealthChecksFunc is a function that returns the probe of all services.
-type HealthChecksFunc func() []HealthReport
+// HealthChecks is a map of health check functions.
+type HealthChecks map[string]HealthReportFunc
 
-// Check returns a summary of the probe of the services.
-func Check(health []HealthReport) HealthSummary {
+// HealthReports is a map of health reports.
+type HealthReports map[string]HealthReport
+
+// Check returns a summary of the health of the services.
+func Check(health HealthReports) HealthSummary {
 	status := Healthy
 
 	for _, s := range health {

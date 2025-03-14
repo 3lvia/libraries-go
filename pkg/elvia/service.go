@@ -30,11 +30,11 @@ type ShutdownFunc func(context.Context) error
 
 // Service configures standard service components and manages their lifecycle.
 type Service struct {
-	logger           *slog.Logger
-	apiServer        *http.Server
-	apiEngine        *gin.Engine
-	shutdownFuncs    []ShutdownFunc
-	healthCheckFuncs []probe.HealthCheckFunc
+	logger        *slog.Logger
+	apiServer     *http.Server
+	apiEngine     *gin.Engine
+	shutdownFuncs []ShutdownFunc
+	healthChecks  probe.HealthChecks
 }
 
 // NewService creates a new service with the given service name and options.
@@ -126,20 +126,20 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 	}
 
 	svc := &Service{
-		logger:           logger,
-		shutdownFuncs:    shutdownFuncs,
-		apiServer:        apiServer,
-		apiEngine:        apiEngine,
-		healthCheckFuncs: make([]probe.HealthCheckFunc, 0),
+		logger:        logger,
+		shutdownFuncs: shutdownFuncs,
+		apiServer:     apiServer,
+		apiEngine:     apiEngine,
+		healthChecks:  make(probe.HealthChecks),
 	}
 
 	if apiEngine != nil && cfg.withApiHealthEndpoint != nil {
-		cfg.withApiHealthEndpoint(apiEngine, func() []probe.HealthReport {
-			healths := make([]probe.HealthReport, 0, len(svc.healthCheckFuncs))
-			for _, check := range svc.healthCheckFuncs {
-				healths = append(healths, check())
+		cfg.withApiHealthEndpoint(apiEngine, func() probe.HealthReports {
+			reports := make(probe.HealthReports)
+			for name, check := range svc.healthChecks {
+				reports[name] = check()
 			}
-			return healths
+			return reports
 		})
 	}
 
@@ -151,9 +151,9 @@ func (s *Service) RegisterShutdown(fn ShutdownFunc) {
 	s.shutdownFuncs = append(s.shutdownFuncs, fn)
 }
 
-// RegisterHealthCheck registers a probe check function that will be run when the probe endpoint is called.
-func (s *Service) RegisterHealthCheck(fn probe.HealthCheckFunc) {
-	s.healthCheckFuncs = append(s.healthCheckFuncs, fn)
+// RegisterHealthCheck registers a health check function that will affect the status of the health endpoint.
+func (s *Service) RegisterHealthCheck(name string, fn probe.HealthReportFunc) {
+	s.healthChecks[name] = fn
 }
 
 // Run starts the service and blocks until the service is stopped.
