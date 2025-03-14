@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/3lvia/libraries-go/pkg/elvia/api/problemdetails"
+	"github.com/3lvia/libraries-go/pkg/elvia/probe"
 	"github.com/3lvia/libraries-go/pkg/elvia/runtime"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -75,8 +76,16 @@ func ConfigureStandardMetricsEndpoint(engine *gin.Engine) {
 
 // ConfigureStandardHealthEndpoint configures a standard health endpoint for the API.
 // The endpoint is exposed at /health and returns a JSON response.
-func ConfigureStandardHealthEndpoint(engine *gin.Engine) {
+func ConfigureStandardHealthEndpoint(engine *gin.Engine, fn func() probe.HealthReports) {
 	engine.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		reports := fn()
+		summary := probe.Check(reports)
+
+		httpStatus := http.StatusOK
+		if summary.Status == probe.Unhealthy {
+			httpStatus = http.StatusServiceUnavailable
+		}
+
+		c.JSON(httpStatus, summary)
 	})
 }

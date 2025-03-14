@@ -7,6 +7,7 @@ import (
 
 	"github.com/3lvia/libraries-go/pkg/elvia/api"
 	"github.com/3lvia/libraries-go/pkg/elvia/observability"
+	"github.com/3lvia/libraries-go/pkg/elvia/probe"
 	"github.com/3lvia/libraries-go/pkg/elvia/runtime"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/attribute"
@@ -39,6 +40,9 @@ type NewApiEngine func(env runtime.Env) *gin.Engine
 // ConfigureApiEndpoint is a function to configure API endpoints.
 type ConfigureApiEndpoint func(engine *gin.Engine)
 
+// ConfigureApiHealthEndpoint is a function to configure the health endpoint.
+type ConfigureApiHealthEndpoint func(engine *gin.Engine, fn func() probe.HealthReports)
+
 // ServiceOpt is a function to configure the service.
 type ServiceOpt func(*config)
 
@@ -47,22 +51,25 @@ type config struct {
 
 	loggerLevel slog.Level
 
+	otelEnabled           bool
 	otelAttributes        []attribute.KeyValue
 	otelPropagator        propagation.TextMapPropagator
 	otelNewTraceProvider  NewTraceProvider
 	otelNewLoggerProvider NewLoggerProvider
 	otelNewMetricProvider NewMetricProvider
 
-	withApiAddr      string
-	withHTTPServer   *http.Server
-	withApiEngine    NewApiEngine
-	withApiEndpoints []ConfigureApiEndpoint
+	withApiAddr           string
+	withHTTPServer        *http.Server
+	withApiEngine         NewApiEngine
+	withApiEndpoints      []ConfigureApiEndpoint
+	withApiHealthEndpoint ConfigureApiHealthEndpoint
 }
 
 func defaultConfig(name string) config {
 	return config{
 		env:         runtime.Production,
 		loggerLevel: slog.LevelWarn,
+		otelEnabled: true,
 		otelAttributes: []attribute.KeyValue{
 			semconv.ServiceName(name),
 		},
@@ -79,8 +86,8 @@ func defaultConfig(name string) config {
 		withApiEndpoints: []ConfigureApiEndpoint{
 			api.ConfigureStandardEndpoints,
 			api.ConfigureStandardMetricsEndpoint,
-			api.ConfigureStandardHealthEndpoint,
 		},
+		withApiHealthEndpoint: api.ConfigureStandardHealthEndpoint,
 	}
 }
 
@@ -111,6 +118,18 @@ func WithEnvLoggerLevel(env runtime.Env) ServiceOpt {
 func WithLoggerLevel(level slog.Level) ServiceOpt {
 	return func(c *config) {
 		c.loggerLevel = level
+	}
+}
+
+// WithOTELDisabled disables OpenTelemetry for the service.
+// OpenTelemetry is enabled by default.
+// OTEL_ENABLED environment variable will override this setting.
+func WithOTELDisabled() ServiceOpt {
+	return func(c *config) {
+		c.otelEnabled = false
+		if observability.IsOTELEnabled() {
+			c.otelEnabled = true
+		}
 	}
 }
 
@@ -175,11 +194,18 @@ func WithAPIEngine(engine NewApiEngine) ServiceOpt {
 }
 
 // WithAPIEndpoints sets the API endpoints of the service.
-// The default endpoints are standard endpoints for health, metrics, and not found.
+// The default endpoints are standard endpoints for metrics, and not found.
 // To add custom endpoints, use this option, and optionally include the standard endpoints
 // found in api.ConfigureStandardEndpoints, api.ConfigureStandardMetricsEndpoint, and api.ConfigureStandardHealthEndpoint.
 func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) ServiceOpt {
 	return func(c *config) {
 		c.withApiEndpoints = endpoints
+	}
+}
+
+// WithAPIHealthEndpoint sets the health endpoint of the service.
+func WithAPIHealthEndpoint(endpoint ConfigureApiHealthEndpoint) ServiceOpt {
+	return func(c *config) {
+		c.withApiHealthEndpoint = endpoint
 	}
 }
