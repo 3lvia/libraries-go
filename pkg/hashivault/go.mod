@@ -2,7 +2,7 @@ module github.com/3lvia/libraries-go/pkg/hashivault
 
 go 1.23.0
 
-toolchain go1.24.1
+toolchain go1.24.2
 
 require (
 	github.com/hashicorp/cap v0.8.0
