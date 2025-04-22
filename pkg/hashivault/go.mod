@@ -2,8 +2,6 @@ module github.com/3lvia/libraries-go/pkg/hashivault
 
 go 1.23.0
 
-toolchain go1.24.2
-
 require (
 	github.com/hashicorp/cap v0.8.0
 	github.com/hashicorp/go-secure-stdlib/base62 v0.1.2
