@@ -5,7 +5,7 @@ go 1.23.0
 retract v0.2.5 // Duplicate of v0.2.4, published by mistake. Use tag v0.2.6 if publishing a new patch release.
 
 require (
-	github.com/hashicorp/cap v0.9.1
+	github.com/hashicorp/cap v0.10.0
 	github.com/hashicorp/go-secure-stdlib/base62 v0.1.2
 	github.com/hashicorp/vault/api v1.20.0
 	go.opentelemetry.io/otel v1.35.0
