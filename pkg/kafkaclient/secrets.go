@@ -38,8 +38,6 @@ func (k K8sSecrets) Get(ctx context.Context, system string) (*SecretConfigValues
 		registryKey:    m["schema_registry_key"].(string),
 		registrySecret: m["schema_registry_secret"].(string),
 
-		blobSasURI: m["blobstore-sas-uri"].(string),
-
 		key:    m["key"].(string),
 		secret: m["secret"].(string),
 
@@ -56,8 +54,6 @@ type SecretConfigValues struct {
 	registryURL, registryKey, registrySecret string
 
 	key, secret string
-
-	blobSasURI string
 
 	bootstrapServer    string
 	environment        string
