@@ -38,21 +38,8 @@ func (k K8sSecrets) Get(ctx context.Context, system string) (*SecretConfigValues
 		registryKey:    m["schema_registry_key"].(string),
 		registrySecret: m["schema_registry_secret"].(string),
 
-		blobSasURI:                                     m["blobstore-sas-uri"].(string),
-		exceptionInvocationConnectionString:            m["exceptioninvocations-connection-string"].(string),
-		exceptionInvocationLowPriorityConnectionString: m["exceptioninvocations-low-priority-connection-string"].(string),
-		exceptionInvocationFailOverConnectionString:    m["exceptioninvocations-low-priority-failed-over-connection-string"].(string),
-		exceptionInvocationLowPriorityTopic:            m["exceptioninvocations-low-priority-topic"].(string),
-		exceptionInvocationsTopic:                      m["exceptioninvocations-topic"].(string),
-
 		key:    m["key"].(string),
 		secret: m["secret"].(string),
-
-		successfulInvocationsConnectionString:            m["successfulinvocations-connection-string"].(string),
-		successfulInvocationsLowPriorityConnectionString: m["successfulinvocations-low-priority-connection-string"].(string),
-		successfulInvocationsFailOverConnectionString:    m["successfulinvocations-low-priority-failed-over-connection-string"].(string),
-		successfulInvocationsLowPriorityTopic:            m["successfulinvocations-low-priority-topic"].(string),
-		successfulInvocationsTopic:                       m["successfulinvocations-topic"].(string),
 
 		bootstrapServer:    mInfo["bootstrap-server"].(string),
 		environment:        mInfo["environment"].(string),
@@ -67,20 +54,6 @@ type SecretConfigValues struct {
 	registryURL, registryKey, registrySecret string
 
 	key, secret string
-
-	blobSasURI string
-
-	exceptionInvocationConnectionString            string
-	exceptionInvocationLowPriorityConnectionString string
-	exceptionInvocationFailOverConnectionString    string
-	exceptionInvocationLowPriorityTopic            string
-	exceptionInvocationsTopic                      string
-
-	successfulInvocationsConnectionString            string
-	successfulInvocationsLowPriorityConnectionString string
-	successfulInvocationsFailOverConnectionString    string
-	successfulInvocationsLowPriorityTopic            string
-	successfulInvocationsTopic                       string
 
 	bootstrapServer    string
 	environment        string
