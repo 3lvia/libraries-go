@@ -8,7 +8,7 @@ require (
 	github.com/prometheus/client_golang v1.23.0
 	github.com/samber/slog-gin v1.18.0
 	github.com/samber/slog-multi v1.6.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.10.0
 	go.opentelemetry.io/contrib/processors/minsev v0.8.0
 	go.opentelemetry.io/otel v1.35.0
