@@ -42,7 +42,7 @@ jobs:
       - name: Test with Go
         run: go test -v -json ./... > tests-${{ matrix.go-version }}.json
       - name: Upload Go test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Go-results-${{ matrix.go-version }}
           path: pkg/elvia/tests-${{ matrix.go-version }}.json
