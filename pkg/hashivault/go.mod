@@ -1,6 +1,6 @@
 module github.com/3lvia/libraries-go/pkg/hashivault
 
-go 1.23.0
+go 1.24
 
 retract v0.2.5 // Duplicate of v0.2.4, published by mistake. Use tag v0.2.6 if publishing a new patch release.
 
