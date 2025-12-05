@@ -44,7 +44,9 @@ jobs:
           go install github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter@latest
 
       - name: Test with Go
-        run: go test -v -json ./... > tests-${{ matrix.go-version }}.json
+        run: go test -v -json ./... > "tests-$GO_VERSION.json"
+        env:
+          GO_VERSION: ${{ matrix.go-version }}
 
       - name: Upload Go test results
         uses: actions/upload-artifact@v5
