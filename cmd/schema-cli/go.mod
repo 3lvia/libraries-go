@@ -1,6 +1,6 @@
 module github.com/3lvia/libraries-go/cmd/schema-cli
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.2.6
@@ -35,8 +35,8 @@ require (
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 )
