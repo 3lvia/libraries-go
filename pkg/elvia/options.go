@@ -136,6 +136,7 @@ func WithOTELDisabled() ServiceOpt {
 
 // WithOTELAttributes sets the OpenTelemetry attributes of the service.
 // You don't have to set the service name attribute as it is set automatically.
+// Schema version: 1.39.0
 func WithOTELAttributes(attrs ...attribute.KeyValue) ServiceOpt {
 	return func(c *config) {
 		c.otelAttributes = append(c.otelAttributes, attrs...)
