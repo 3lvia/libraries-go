@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
 )
 
 const (
@@ -52,6 +52,7 @@ type config struct {
 	loggerLevel slog.Level
 
 	otelEnabled           bool
+	otelSchemaURL         string
 	otelAttributes        []attribute.KeyValue
 	otelPropagator        propagation.TextMapPropagator
 	otelNewTraceProvider  NewTraceProvider

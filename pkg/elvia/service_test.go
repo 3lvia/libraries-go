@@ -11,7 +11,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
 )
 
 func Test_Service(t *testing.T) {
@@ -27,7 +27,7 @@ func Test_Service(t *testing.T) {
 			WithLoggerLevel(slog.LevelDebug),
 			WithOTELAttributes(
 				semconv.ServiceVersion("v0.0.0"),
-				semconv.DeploymentEnvironment(runtime.Development.String()),
+				semconv.DeploymentEnvironmentName(runtime.Development.String()),
 			),
 			WithOTELTraceProvider(func(ctx context.Context, env runtime.Env, opts ...trace.TracerProviderOption) (*trace.TracerProvider, error) {
 				otelWasCalled[0] = true
