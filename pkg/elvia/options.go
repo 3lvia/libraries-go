@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
 )
 
 const (
@@ -135,6 +135,7 @@ func WithOTELDisabled() ServiceOpt {
 
 // WithOTELAttributes sets the OpenTelemetry attributes of the service.
 // You don't have to set the service name attribute as it is set automatically.
+// Schema version: 1.39.0
 func WithOTELAttributes(attrs ...attribute.KeyValue) ServiceOpt {
 	return func(c *config) {
 		c.otelAttributes = append(c.otelAttributes, attrs...)
