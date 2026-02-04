@@ -52,7 +52,6 @@ type config struct {
 	loggerLevel slog.Level
 
 	otelEnabled           bool
-	otelSchemaURL         string
 	otelAttributes        []attribute.KeyValue
 	otelPropagator        propagation.TextMapPropagator
 	otelNewTraceProvider  NewTraceProvider
