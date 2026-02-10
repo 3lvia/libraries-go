@@ -99,6 +99,10 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 
 		apiEngine = cfg.withApiEngine(cfg.env)
 		if apiEngine != nil {
+			if cfg.withApiOTELMiddleware != nil {
+				cfg.withApiOTELMiddleware(apiEngine)
+			}
+
 			for _, endpoint := range cfg.withApiEndpoints {
 				endpoint(apiEngine)
 			}
