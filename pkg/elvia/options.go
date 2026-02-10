@@ -43,6 +43,9 @@ type ConfigureApiEndpoint func(engine *gin.Engine)
 // ConfigureApiHealthEndpoint is a function to configure the health endpoint.
 type ConfigureApiHealthEndpoint func(engine *gin.Engine, fn func() probe.HealthReports)
 
+// ConfigureApiOTELMiddleware is a function to configure the OpenTelemetry middleware for the API.
+type ConfigureApiOTELMiddleware func(engine *gin.Engine)
+
 // ServiceOpt is a function to configure the service.
 type ServiceOpt func(*config)
 
@@ -63,15 +66,17 @@ type config struct {
 	withApiEngine         NewApiEngine
 	withApiEndpoints      []ConfigureApiEndpoint
 	withApiHealthEndpoint ConfigureApiHealthEndpoint
+	withApiOTELMiddleware ConfigureApiOTELMiddleware
 }
 
-func defaultConfig(name string) config {
+func defaultConfig(systemName, serviceName string) config {
 	return config{
 		env:         runtime.Production,
 		loggerLevel: slog.LevelWarn,
 		otelEnabled: true,
 		otelAttributes: []attribute.KeyValue{
-			semconv.ServiceName(name),
+			semconv.K8SNamespaceName(systemName),
+			semconv.ServiceName(serviceName),
 		},
 		otelPropagator: propagation.NewCompositeTextMapPropagator(
 			propagation.TraceContext{},
@@ -88,6 +93,7 @@ func defaultConfig(name string) config {
 			api.ConfigureStandardMetricsEndpoint,
 		},
 		withApiHealthEndpoint: api.ConfigureStandardHealthEndpoint,
+		withApiOTELMiddleware: api.ConfigureOTELMiddleware,
 	}
 }
 
@@ -208,5 +214,12 @@ func WithAPIEndpoints(endpoints ...ConfigureApiEndpoint) ServiceOpt {
 func WithAPIHealthEndpoint(endpoint ConfigureApiHealthEndpoint) ServiceOpt {
 	return func(c *config) {
 		c.withApiHealthEndpoint = endpoint
+	}
+}
+
+// WithAPIOTELMiddleware sets the OpenTelemetry middleware for the API.
+func WithAPIOTELMiddleware(middleware ConfigureApiOTELMiddleware) ServiceOpt {
+	return func(c *config) {
+		c.withApiOTELMiddleware = middleware
 	}
 }

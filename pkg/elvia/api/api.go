@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/3lvia/libraries-go/pkg/elvia/api/problemdetails"
 	"github.com/3lvia/libraries-go/pkg/elvia/probe"
@@ -11,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	sloggin "github.com/samber/slog-gin"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel"
 )
 
 // NewDefaultServer creates a new HTTP server with default settings.
@@ -44,6 +47,21 @@ func NewDefaultEngine(env runtime.Env) *gin.Engine {
 	engine.Use(gin.Recovery())
 
 	return engine
+}
+
+// ConfigureOTELMiddleware configures the OpenTelemetry middleware for the API.
+// The middleware is configured to use the global tracer and meter providers.
+// /health and /metrics endpoints are excluded from tracing and metrics collection.
+func ConfigureOTELMiddleware(engine *gin.Engine) {
+	opts := []otelgin.Option{
+		otelgin.WithTracerProvider(otel.GetTracerProvider()),
+		otelgin.WithMeterProvider(otel.GetMeterProvider()),
+		otelgin.WithFilter(func(r *http.Request) bool {
+			// Return true to trace, false to skip
+			return !strings.Contains(r.URL.Path, "/health") && !strings.Contains(r.URL.Path, "/metrics")
+		}),
+	}
+	engine.Use(otelgin.Middleware("", opts...))
 }
 
 // ConfigureStandardEndpoints configures standard endpoints for the API.

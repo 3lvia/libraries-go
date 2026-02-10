@@ -3,7 +3,6 @@ package elvia
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -39,9 +38,8 @@ type Service struct {
 
 // NewService creates a new service with the given service name and options.
 func NewService(ctx context.Context, systemName, serviceName string, opts ...ServiceOpt) (*Service, error) {
-	name := fmt.Sprintf("%s.%s", systemName, serviceName)
 
-	cfg := defaultConfig(name)
+	cfg := defaultConfig(systemName, serviceName)
 	for _, opt := range opts {
 		opt(&cfg)
 	}
@@ -81,7 +79,7 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 			shutdownFuncs = append(shutdownFuncs, loggerProvider.Shutdown)
 			global.SetLoggerProvider(loggerProvider)
 
-			logger = runtime.LoggerFanout(logger, otelslog.NewHandler(name, otelslog.WithLoggerProvider(loggerProvider)))
+			logger = runtime.LoggerFanout(logger, otelslog.NewHandler(serviceName, otelslog.WithLoggerProvider(loggerProvider)))
 		}
 
 		metricProvider, err := cfg.otelNewMetricProvider(ctx, cfg.env, metric.WithResource(r))
@@ -101,6 +99,10 @@ func NewService(ctx context.Context, systemName, serviceName string, opts ...Ser
 
 		apiEngine = cfg.withApiEngine(cfg.env)
 		if apiEngine != nil {
+			if cfg.withApiOTELMiddleware != nil {
+				cfg.withApiOTELMiddleware(apiEngine)
+			}
+
 			for _, endpoint := range cfg.withApiEndpoints {
 				endpoint(apiEngine)
 			}
