@@ -6,7 +6,7 @@ require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.2.7
 	github.com/3lvia/libraries-go/pkg/mschema v0.0.6
 	github.com/linkedin/goavro/v2 v2.15.0
-	github.com/twmb/franz-go v1.20.6
+	github.com/twmb/franz-go v1.20.7
 )
 
 require (
@@ -29,7 +29,7 @@ require (
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-7 // indirect
 	github.com/hashicorp/vault/api v1.22.0 // indirect
-	github.com/klauspost/compress v1.18.3 // indirect
+	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.25 // indirect
