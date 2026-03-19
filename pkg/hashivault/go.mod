@@ -1,6 +1,6 @@
 module github.com/3lvia/libraries-go/pkg/hashivault
 
-go 1.24.0
+go 1.25.0
 
 retract v0.2.5 // Duplicate of v0.2.4, published by mistake.
 
@@ -8,9 +8,9 @@ require (
 	github.com/hashicorp/cap v0.12.0
 	github.com/hashicorp/go-secure-stdlib/base62 v0.1.2
 	github.com/hashicorp/vault/api v1.22.0
-	go.opentelemetry.io/otel v1.40.0
-	go.opentelemetry.io/otel/sdk v1.40.0
-	go.opentelemetry.io/otel/trace v1.40.0
+	go.opentelemetry.io/otel v1.42.0
+	go.opentelemetry.io/otel/sdk v1.42.0
+	go.opentelemetry.io/otel/trace v1.42.0
 )
 
 require (
@@ -34,9 +34,9 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel/metric v1.40.0 // indirect
+	go.opentelemetry.io/otel/metric v1.42.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 )
