@@ -1,10 +1,10 @@
 module github.com/3lvia/libraries-go/cmd/schema-cli
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.2.7
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.6
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.7
 	github.com/spf13/cobra v1.10.2
 )
 
@@ -33,9 +33,9 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.40.0 // indirect
-	go.opentelemetry.io/otel/metric v1.40.0 // indirect
-	go.opentelemetry.io/otel/trace v1.40.0 // indirect
+	go.opentelemetry.io/otel v1.42.0 // indirect
+	go.opentelemetry.io/otel/metric v1.42.0 // indirect
+	go.opentelemetry.io/otel/trace v1.42.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
