@@ -19,7 +19,7 @@ concurrency:
 jobs:
   analyze:
     name: Analyze
-    runs-on: elvia-runner-v2
+    runs-on: elvia-runner
     permissions:
       actions: read
       contents: read
