@@ -3,7 +3,7 @@ module github.com/3lvia/libraries-go/cmd/schema-cli
 go 1.25.0
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.3.0
+	github.com/3lvia/libraries-go/pkg/hashivault v0.3.1
 	github.com/3lvia/libraries-go/pkg/mschema v0.0.7
 	github.com/spf13/cobra v1.10.2
 )
@@ -26,7 +26,7 @@ require (
 	github.com/hashicorp/go-sockaddr v1.0.7 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-7 // indirect
-	github.com/hashicorp/vault/api v1.22.0 // indirect
+	github.com/hashicorp/vault/api v1.23.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
