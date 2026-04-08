@@ -7,7 +7,7 @@ retract v0.2.5 // Duplicate of v0.2.4, published by mistake.
 require (
 	github.com/hashicorp/cap v0.12.0
 	github.com/hashicorp/go-secure-stdlib/base62 v0.1.2
-	github.com/hashicorp/vault/api v1.22.0
+	github.com/hashicorp/vault/api v1.23.0
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/sdk v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
