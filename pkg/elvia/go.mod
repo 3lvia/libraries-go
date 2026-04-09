@@ -7,7 +7,7 @@ require (
 	github.com/nats-io/nats.go v1.50.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/samber/slog-gin v1.21.0
-	github.com/samber/slog-multi v1.7.1
+	github.com/samber/slog-multi v1.8.0
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.18.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.68.0
@@ -61,7 +61,7 @@ require (
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
 	github.com/samber/lo v1.53.0 // indirect
-	github.com/samber/slog-common v0.20.0 // indirect
+	github.com/samber/slog-common v0.21.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
