@@ -1,7 +1,7 @@
 github.com/3lvia/libraries-go/pkg/hashivault v0.3.2 h1:bCAjdLNh8n1nnRLXy/+hotGUeVy+YxKC7B2vT4SRTiQ=
 github.com/3lvia/libraries-go/pkg/hashivault v0.3.2/go.mod h1:XpM+kq9u2ypVLTy8na3vqW8PzBtCKhb+vu2EyZD0agA=
-github.com/3lvia/libraries-go/pkg/mschema v0.0.7 h1:G5H1F+IEu877jul0K2RuZA4m3uy+cR/O/ZqypIqAiDk=
-github.com/3lvia/libraries-go/pkg/mschema v0.0.7/go.mod h1:Va1xmC5qYMjSOcgxPapnjqUoSfk3J5ubnJrKSCvfPos=
+github.com/3lvia/libraries-go/pkg/mschema v0.0.8 h1:z8aTT5GBet2LpcbAN/i5Q4t3Mkp5JLpXrBMWGICagsY=
+github.com/3lvia/libraries-go/pkg/mschema v0.0.8/go.mod h1:6clnD7V4znmvMVQkoBNueDsZjQV7rqiywRupgytmX/I=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
 github.com/cenkalti/backoff/v4 v4.3.0/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

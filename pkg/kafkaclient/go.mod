@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/3lvia/libraries-go/pkg/hashivault v0.3.2
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.7
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.8
 	github.com/linkedin/goavro/v2 v2.15.0
 	github.com/twmb/franz-go v1.20.7
 )
