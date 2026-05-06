@@ -1,7 +1,23 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:best-practices",
+    "group:allNonMajor",
+    "group:allDigest",
+    "group:linters",
+    ":automergeMinor",
+    ":combinePatchMinorReleases",
+    ":dependencyDashboard"
   ],
+  "timezone": "Europe/Oslo",
+  "schedule": ["after 4pm and before 8am every weekday", "every weekend"],
+  "prConcurrentLimit": 5,
+  "rebaseWhen": "conflicted",
+  "minimumReleaseAge": "3 days",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"],
+    "automerge": true
+  },
   "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"]
 }
