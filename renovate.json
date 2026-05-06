@@ -10,7 +10,7 @@
     ":dependencyDashboard"
   ],
   "timezone": "Europe/Oslo",
-  "schedule": ["after 4pm and before 8am every weekday", "every weekend"],
+  "schedule": ["after 4pm every weekday",  "every weekend", "before 8am every weekday"],
   "prConcurrentLimit": 5,
   "rebaseWhen": "conflicted",
   "minimumReleaseAge": "3 days",
