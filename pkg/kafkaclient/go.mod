@@ -3,8 +3,8 @@ module github.com/3lvia/libraries-go/pkg/kafkaclient
 go 1.25.0
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.3.3
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.8
+	github.com/3lvia/libraries-go/pkg/hashivault v0.3.4
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.9
 	github.com/linkedin/goavro/v2 v2.15.0
 	github.com/twmb/franz-go v1.21.2
 )
@@ -32,14 +32,14 @@ require (
 	github.com/klauspost/compress v1.18.6 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pierrec/lz4/v4 v4.1.26 // indirect
+	github.com/pierrec/lz4/v4 v4.1.27 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/twmb/franz-go/pkg/kmsg v1.13.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.43.0 // indirect
-	go.opentelemetry.io/otel/metric v1.43.0 // indirect
-	go.opentelemetry.io/otel/trace v1.43.0 // indirect
-	golang.org/x/net v0.53.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	go.opentelemetry.io/otel v1.44.0 // indirect
+	go.opentelemetry.io/otel/metric v1.44.0 // indirect
+	go.opentelemetry.io/otel/trace v1.44.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 )
