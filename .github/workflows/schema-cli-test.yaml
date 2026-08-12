@@ -1,0 +1,67 @@
+name: MSchema Test
+
+on:
+  push:
+    branches: [trunk]
+    paths:
+      - '.github/workflows/schema-cli-test.yaml'
+      - 'cmd/schema-cli/**/*.go'
+      - 'cmd/schema-cli/go.mod'
+      - 'cmd/schema-cli/go.sum'
+  pull_request:
+    branches: [trunk]
+    paths:
+      - '.github/workflows/schema-cli-test.yaml'
+      - 'cmd/schema-cli/**/*.go'
+      - 'cmd/schema-cli/go.mod'
+      - 'cmd/schema-cli/go.sum'
+
+defaults:
+  run:
+    working-directory: ./cmd/schema-cli
+
+jobs:
+  test:
+    name: Test
+    runs-on: elvia-runner
+    strategy:
+      matrix:
+        go-version: ['1.25.x', '1.26.x']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Setup Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache-dependency-path: 'cmd/schema-cli/go.sum'
+
+      - name: Install Go packages
+        run: |
+          go mod download
+          go install github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter@latest
+
+      - name: Test with Go
+        run: go test -v -json ./... > "tests-$GO_VERSION.json"
+        env:
+          GO_VERSION: ${{ matrix.go-version }}
+
+      - name: Upload Go test results
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: 'Go-results-${{ matrix.go-version }}'
+          path: 'cmd/schema-cli/tests-${{ matrix.go-version }}.json'
+
+      - name: Prepare Test Report
+        if: always()
+        run: go-ctrf-json-reporter -o "$GITHUB_WORKSPACE/ctrf-$GO_VERSION.json" < "tests-$GO_VERSION.json"
+        env:
+          GO_VERSION: ${{ matrix.go-version }}
+
+      - name: Publish Test Report
+        if: always()
+        uses: ctrf-io/github-test-reporter@0f299074936c32ccaab5be5230511f6b2b9080aa # v1
+        with:
+          report-path: 'ctrf-${{ matrix.go-version }}.json'
