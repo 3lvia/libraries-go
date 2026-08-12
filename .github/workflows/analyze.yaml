@@ -25,6 +25,6 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: 3lvia/core-github-actions-templates/analyze@cfcace852431a09d57ff7100da2177b56a9b562c # trunk
+      - uses: 3lvia/core-github-actions-templates/analyze@3f41c1625fa5e1cb464a7607dc9a07fa9e13b87d # trunk
         with:
           language: 'go'
