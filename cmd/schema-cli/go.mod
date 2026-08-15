@@ -3,8 +3,8 @@ module github.com/3lvia/libraries-go/cmd/schema-cli
 go 1.25.0
 
 require (
-	github.com/3lvia/libraries-go/pkg/hashivault v0.3.4
-	github.com/3lvia/libraries-go/pkg/mschema v0.0.9
+	github.com/3lvia/libraries-go/pkg/hashivault v0.3.6
+	github.com/3lvia/libraries-go/pkg/mschema v0.0.11
 	github.com/spf13/cobra v1.10.2
 )
 
