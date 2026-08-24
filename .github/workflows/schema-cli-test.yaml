@@ -31,6 +31,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        #test to remove pin from above line
 
       - name: Setup Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
