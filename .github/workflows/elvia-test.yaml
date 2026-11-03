@@ -23,7 +23,7 @@ defaults:
 jobs:
   test:
     name: Test
-    runs-on: elvia-runner
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         go-version: ['1.26.x', '1.27.x']
